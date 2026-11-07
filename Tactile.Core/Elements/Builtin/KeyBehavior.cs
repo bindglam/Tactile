@@ -24,7 +24,7 @@ public sealed class KeyBehavior : ElementBehavior<KeyElement, KeyVisual>
         _bindings = (element.Bindings ?? []).Distinct().ToArray();
         // 실행 중 원본이 바뀌어도 영향받지 않도록 복사
         _style = element.Style?.Clone() ?? new KeyStyle();
-        _rain = element.RainOverride ?? context.Layout.Rain;
+        _rain = element.Rain;
         _hasRain = _rain.Enabled && _rain.Speed > 0f && _rain.MaxLength > 0f;
 
         State = new KeyState(context.RainCapacity);

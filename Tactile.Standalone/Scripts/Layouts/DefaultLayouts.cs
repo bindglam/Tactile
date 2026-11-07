@@ -48,14 +48,6 @@ public static class DefaultLayouts
         var layout = new KeyViewerLayout
         {
             Canvas = new Vector2(width, height),
-            Rain = new RainSettings
-            {
-                Enabled = true,
-                Direction = RainDirection.Up,
-                Speed = 900f,
-                MaxLength = RainLength,
-                Color = Color.FromHex("#7FD3FFC0"),
-            },
         };
 
         for (int i = 0; i < keys.Length; i++)
@@ -67,6 +59,14 @@ public static class DefaultLayouts
                 Bounds = new Rect(Margin + i * (KeySize + KeyGap), keyTop, KeySize, KeySize),
                 Label = LabelOf(key),
                 Style = CreateKeyStyle(), // 키마다 따로 가지므로 에디터에서 개별 수정 가능
+                Rain = new RainSettings
+                {
+                    Enabled = true,
+                    Direction = RainDirection.Up,
+                    Speed = 900f,
+                    MaxLength = RainLength,
+                    Color = Color.FromHex("#7FD3FFC0"),
+                },
                 ShowCount = true,
                 Bindings = { InputBinding.Keyboard(key) },
             });

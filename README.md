@@ -89,6 +89,36 @@ renderers.Register<GraphElement, GraphVisual>((element, context) => new GraphRen
 3. **Visual**: 렌더러에 넘기는 엔진 무관 값 (바뀔 때만 `Revision` 증가)
 4. **렌더러** (`IElementRenderer<TVisual>`): 엔진별로 그리기만 담당
 
+## 레이아웃 파일
+
+레이아웃은 사람이 읽고 고칠 수 있는 JSON으로 저장하고 불러옵니다. 파일에 없는 값은 기본값을 쓰므로 바꾸고 싶은 것만 적어도 됩니다.
+
+```csharp
+LayoutSerializer.SaveFile(layout, "layout.json");
+KeyViewerLayout layout = LayoutSerializer.LoadFile("layout.json");
+```
+
+```jsonc
+{
+  "version": 1,
+  "canvas": { "x": 750, "y": 696 },
+  "elements": [
+    {
+      "type": "tactile:key",
+      "id": "key-Tab",
+      "bounds": { "x": 20, "y": 320, "width": 80, "height": 80 },
+      "bindings": ["Keyboard.Tab"],
+      "label": "Tab",
+      "style": { "pressed": { "fill": "#7FD3FFF0" } }
+    }
+  ]
+}
+```
+
+- 요소의 공개 속성을 그대로 저장하므로, 애드온 요소도 등록만 하면 따로 코드 없이 저장됩니다.
+- 애드온이 빠진 상태에서 불러온 요소는 내용을 보존했다가 다시 저장할 때 그대로 씁니다.
+- 독립 앱은 Godot 사용자 데이터 폴더의 `layout.json`, 얼불춤 모드는 `UserData/Tactile/layout.json`을 읽습니다. 파일이 없으면 기본 레이아웃을 그 자리에 만들어 둡니다.
+
 ## 얼불춤 모드
 
 [MelonLoader](https://melonwiki.xyz)가 설치된 A Dance of Fire and Ice에서 키뷰어를 띄웁니다.

@@ -4,6 +4,7 @@ using Tactile.Adapters.Unity.Input;
 using Tactile.ADOFAI;
 using Tactile.Core.Input;
 using Tactile.Core.Layout;
+using Tactile.Core.Layout.Serialization;
 using Tactile.Standalone.Layouts;
 using UnityEngine;
 
@@ -59,9 +60,36 @@ public sealed class TactileMod : MelonMod
         _viewer = null;
     }
 
+    /// <summary>
+    /// <c>UserData/Tactile/layout.json</c>을 읽습니다. 없으면 기본 레이아웃을 저장해 두고(직접 고쳐 쓸 수 있도록) 사용합니다.
+    /// 파일이 잘못되어 있으면 파일은 그대로 두고 기본 레이아웃을 사용합니다.
+    /// </summary>
+    private KeyViewerLayout LoadLayout()
+    {
+        string path = System.IO.Path.Combine(MelonLoader.Utils.MelonEnvironment.UserDataDirectory, "Tactile", "layout.json");
+        try
+        {
+            if (System.IO.File.Exists(path))
+            {
+                LoggerInstance.Msg($"레이아웃을 불러옵니다: {path}");
+                return LayoutSerializer.LoadFile(path);
+            }
+
+            KeyViewerLayout layout = DefaultLayouts.FourKeys();
+            LayoutSerializer.SaveFile(layout, path);
+            LoggerInstance.Msg($"기본 레이아웃을 저장했습니다: {path}");
+            return layout;
+        }
+        catch (Exception e) when (e is LayoutFormatException or System.IO.IOException or UnauthorizedAccessException)
+        {
+            LoggerInstance.Error($"레이아웃 파일을 읽지 못해 기본 레이아웃을 사용합니다 ({path}): {e.Message}");
+            return DefaultLayouts.FourKeys();
+        }
+    }
+
     private void CreateViewer()
     {
-        _layout = DefaultLayouts.FourKeys();
+        _layout = LoadLayout();
         if (!_settings.ShowHands.Value)
             _layout.Elements.RemoveAll(e => e is Core.Layout.Elements.HandsElement);
 

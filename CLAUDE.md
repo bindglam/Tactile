@@ -29,7 +29,7 @@ dotnet build Tactile.ADOFAI                       # 게임 경로가 다르면 -
 - **Tactile.Core**: `netstandard2.0`, 외부 의존성 없음 (모드 로더 환경의 DLL 충돌 방지). Unity Mono/IL2CPP, Godot .NET, 일반 .NET에서 모두 로드되어야 하므로 최신 BCL API를 쓰지 말 것. `record`/`init`용 타입은 `Polyfills.cs`에 있습니다.
 - **Tactile.Adapters.Godot** (net8.0) / **Tactile.Adapters.Unity**: 엔진 패키지는 컴파일 전용 참조(출력에 복사 안 함).
 - **Tactile.Adapters.Unity**: UnityEngine.UI 없이 엔진 모듈만 참조합니다 (BepInEx 피드에 UI 패키지가 없고, 게임마다 UI 버전이 다름). 그래서 `CanvasRenderer`에 메시를 직접 넣고(`MeshView`), 글자는 `Font.GetCharacterInfo`로 직접 배치합니다 (`TextGenerator`/`UIVertex`는 Unity 버전마다 필드 형식이 달라 쓰지 않음). 오버레이 캔버스(`TactileUnityViewer`)에 그리고, macOS 외 플랫폼은 `UnityLegacyKeyboard`(프레임 단위 `Input.GetKey` 폴링)로 대신합니다. 손은 기본적으로 2D 선 메시(`UnityHandsRenderer`)로 그립니다. 선택용 `UnityHands3DRenderer`는 멀리 떨어진 위치·전용 레이어(기본 31)에 캡슐들과 꺼 둔 정사영 카메라를 두고 `RenderTexture`에 직접 `Render()`합니다 (Core 좌표의 z만 반전).
-- **Tactile.ADOFAI**: A Dance of Fire and Ice용 MelonLoader 모드 (`netstandard2.1`, Unity 6 Mono). 게임의 `Managed/`와 `MelonLoader/net35/`의 DLL을 `Private=false`로 참조합니다 (macOS는 `.app/Contents/Resources/Data/Managed`). 레이아웃은 Standalone의 `DefaultLayouts.cs`를 링크해서 씁니다. 이 PC의 게임에는 Quartz(UMM 모드를 불러오는 MelonLoader 모드)가 함께 설치되어 있습니다.
+- **Tactile.ADOFAI**: A Dance of Fire and Ice용 MelonLoader 모드 (`netstandard2.1`, Unity 6 Mono). 게임의 `Managed/`와 `MelonLoader/net35/`의 DLL을 `Private=false`로 참조합니다 (macOS는 `.app/Contents/Resources/Data/Managed`). 레이아웃은 `UserData/Tactile/layout.json`에서 읽고, 없으면 Standalone의 `DefaultLayouts.cs`(링크)로 만든 기본 레이아웃을 저장합니다. 이 PC의 게임에는 Quartz(UMM 모드를 불러오는 MelonLoader 모드)가 함께 설치되어 있습니다.
 - **Tactile.Standalone**: Godot 앱. 어댑터의 `TactileGodotViewer`를 사용하는 얇은 호스트(`Scripts/Viewer/KeyViewerHost.cs`)와 기본 레이아웃(`Scripts/Layouts/DefaultLayouts.cs`).
 
 ## 아키텍처
@@ -49,6 +49,10 @@ dotnet build Tactile.ADOFAI                       # 게임 경로가 다르면 -
 - `RendererRegistry<TContext>` (엔진별): 요소 클래스 → 렌더러 팩토리. 부모 클래스로 폴백, `Register`는 덮어씀. `Bind(context)`로 `IElementViewProvider`를 만들어 `KeyViewer`에 넘김. Godot 기본값은 `GodotRenderers.CreateDefault()`.
 
 `KeyViewer.Update()` 흐름: 장치에서 이벤트를 읽음 → 전역 눌림 집합으로 중복 Down/Up 제거 → 요소들의 `Bindings`에 포함된 입력만 통계(`InputStatistics`)에 기록 → 모든 Behavior에 `OnInput` → 레이아웃 순서대로 `Update` 후 `Render`. 등록되지 않은 요소는 `UnsupportedElements`에 모입니다.
+
+### 레이아웃 파일 (`Layout/Serialization`)
+
+`LayoutSerializer`가 `KeyViewerLayout`을 JSON으로 저장·불러옵니다. netstandard2.0에 `System.Text.Json`이 없어 `Json.cs`에 최소 JSON 리더(주석·끝 쉼표 허용, 줄 번호 오류)/라이터를 직접 두었습니다. 요소는 `"type"`에 `ElementRegistry` 종류 ID를 쓰고, 나머지는 리플렉션으로 공개 get/public set 속성을 camelCase로 저장합니다 (애드온 요소도 등록만으로 저장됨, 제외는 `[LayoutIgnore]`, 매개변수 없는 생성자 필요). 기본 지원 값이 아닌 읽기 전용 형식(`Color`, `Rect`, `Vector2/3`, `InputBinding`)은 직렬화기에 직접 변환 코드가 있습니다. 불러올 때 파일에 없는 속성은 기본값 유지(스타일 객체·구조체는 기본값 위에 덮어씀), 등록되지 않은 종류는 `UnknownElement`로 원본을 보존해 다시 저장합니다. Standalone은 `user://layout.json`, 모드는 `UserData/Tactile/layout.json`을 읽고, 없으면 기본 레이아웃을 저장합니다.
 
 ### 입력 (macOS)
 

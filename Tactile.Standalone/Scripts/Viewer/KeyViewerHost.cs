@@ -3,6 +3,7 @@ using Godot;
 using Tactile.Adapters.Godot;
 using Tactile.Core.Input;
 using Tactile.Core.Layout;
+using Tactile.Core.Layout.Serialization;
 using Tactile.Standalone.Layouts;
 
 namespace Tactile.Standalone.Viewer;
@@ -29,9 +30,36 @@ public partial class KeyViewerHost : Node2D
     /// <summary>표시 중인 레이아웃.</summary>
     public KeyViewerLayout? Layout { get; private set; }
 
+    /// <summary>레이아웃 파일 위치 (Godot 사용자 데이터 폴더).</summary>
+    public const string LayoutPath = "./layout.json";
+
     public override void _Ready()
     {
-        ShowLayout(DefaultLayouts.FourKeys());
+        ShowLayout(LoadLayout());
+    }
+
+    /// <summary>
+    /// 레이아웃 파일을 읽습니다. 없으면 기본 레이아웃을 그 자리에 저장해 두고(직접 고쳐 쓸 수 있도록) 사용합니다.
+    /// 파일이 잘못되어 있으면 파일은 그대로 두고 기본 레이아웃을 표시합니다.
+    /// </summary>
+    private static KeyViewerLayout LoadLayout()
+    {
+        string path = ProjectSettings.GlobalizePath(LayoutPath);
+        try
+        {
+            if (System.IO.File.Exists(path))
+                return LayoutSerializer.LoadFile(path);
+
+            KeyViewerLayout layout = DefaultLayouts.FourKeys();
+            LayoutSerializer.SaveFile(layout, path);
+            GD.Print($"[Tactile] 기본 레이아웃을 저장했습니다: {path}");
+            return layout;
+        }
+        catch (Exception e) when (e is LayoutFormatException or System.IO.IOException or UnauthorizedAccessException)
+        {
+            GD.PushError($"[Tactile] 레이아웃 파일을 읽지 못해 기본 레이아웃을 사용합니다 ({path}): {e.Message}");
+            return DefaultLayouts.FourKeys();
+        }
     }
 
     public override void _Process(double delta)

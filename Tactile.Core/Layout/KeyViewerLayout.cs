@@ -26,9 +26,6 @@ public sealed class KeyViewerLayout
     /// </summary>
     public float Scale { get; set; } = 1f;
 
-    /// <summary>레인 기본 설정. 키마다 <see cref="KeyElement.RainOverride"/>로 덮어쓸 수 있습니다.</summary>
-    public RainSettings Rain { get; set; } = RainSettings.Default;
-
     /// <summary>화면 요소. 목록 순서대로 그리며, 나중 요소가 위에 그려집니다.</summary>
     public List<LayoutElement> Elements { get; set; } = [];
 }

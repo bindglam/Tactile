@@ -13,12 +13,12 @@ public sealed class KeyElement : LayoutElement
 
     /// <summary>모양 (평소, 눌림, 전환 시간).</summary>
     public KeyStyle Style { get; set; } = new();
+    
+    /// <summary>이 키만의 레인 설정.</summary>
+    public RainSettings Rain { get; set; } = RainSettings.Default;
 
     /// <summary>누른 횟수를 표시할지.</summary>
     public bool ShowCount { get; set; }
-
-    /// <summary>이 키만의 레인 설정. null이면 <see cref="KeyViewerLayout.Rain"/>을 사용합니다.</summary>
-    public RainSettings? RainOverride { get; set; }
 }
 
 /// <summary>
