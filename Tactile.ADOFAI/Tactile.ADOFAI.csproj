@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!--
+        A Dance of Fire and Ice용 MelonLoader 모드.
+        얼불춤은 Unity 6 (Mono) 게임이므로 MelonLoader 안내에 따라 .NET Standard 2.1을 대상으로 함.
+
+        게임 경로가 기본 Steam 경로와 다르면: dotnet build -p:GameDir="/path/to/A Dance of Fire and Ice"
+        빌드 후 게임 폴더로 복사하지 않으려면: dotnet build -p:Deploy=false
+    -->
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Tactile.ADOFAI</AssemblyName>
+        <RootNamespace>Tactile.ADOFAI</RootNamespace>
+        <Deploy Condition="'$(Deploy)' == ''">true</Deploy>
+        <!-- 게임 어셈블리가 BCL 확장 DLL(System.Memory 등)의 더 새 버전을 참조해 생기는 버전 충돌 경고. 실행 시에는 게임에 있는 버전이 쓰임 -->
+        <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
+    </PropertyGroup>
+
+    <!-- 게임 경로 (macOS / Windows Steam 기본 위치) -->
+    <PropertyGroup Condition="'$(GameDir)' == ''">
+        <GameDir Condition="$([MSBuild]::IsOSPlatform('OSX'))">$(HOME)/Library/Application Support/Steam/steamapps/common/A Dance of Fire and Ice</GameDir>
+        <GameDir Condition="$([MSBuild]::IsOSPlatform('Windows'))">C:\Program Files (x86)\Steam\steamapps\common\A Dance of Fire and Ice</GameDir>
+    </PropertyGroup>
+    <PropertyGroup>
+        <!-- 게임 어셈블리 위치: macOS는 .app 안, Windows는 <게임>_Data 안 -->
+        <ManagedDir Condition="Exists('$(GameDir)/ADanceOfFireAndIce.app/Contents/Resources/Data/Managed')">$(GameDir)/ADanceOfFireAndIce.app/Contents/Resources/Data/Managed</ManagedDir>
+        <ManagedDir Condition="'$(ManagedDir)' == ''">$(GameDir)/A Dance of Fire and Ice_Data/Managed</ManagedDir>
+        <!-- Unity 6 (Mono)용 MelonLoader 런타임 -->
+        <MelonLoaderDir>$(GameDir)/MelonLoader/net35</MelonLoaderDir>
+    </PropertyGroup>
+
+    <!-- 게임에 이미 있는 DLL은 참조만 하고 출력에 복사하지 않음 -->
+    <ItemGroup>
+        <Reference Include="MelonLoader" HintPath="$(MelonLoaderDir)/MelonLoader.dll" Private="false" />
+        <Reference Include="0Harmony" HintPath="$(MelonLoaderDir)/0Harmony.dll" Private="false" />
+        <Reference Include="Assembly-CSharp" HintPath="$(ManagedDir)/Assembly-CSharp.dll" Private="false" />
+        <Reference Include="UnityEngine" HintPath="$(ManagedDir)/UnityEngine.dll" Private="false" />
+        <Reference Include="UnityEngine.CoreModule" HintPath="$(ManagedDir)/UnityEngine.CoreModule.dll" Private="false" />
+        <Reference Include="UnityEngine.UIModule" HintPath="$(ManagedDir)/UnityEngine.UIModule.dll" Private="false" />
+        <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(ManagedDir)/UnityEngine.TextRenderingModule.dll" Private="false" />
+        <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(ManagedDir)/UnityEngine.InputLegacyModule.dll" Private="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Tactile.Core\Tactile.Core.csproj" />
+        <ProjectReference Include="..\Tactile.Adapters.Unity\Tactile.Adapters.Unity.csproj" />
+        <!-- 레이아웃 파일 저장·불러오기가 생기기 전까지 Standalone의 기본 레이아웃을 같이 사용 -->
+        <Compile Include="..\Tactile.Standalone\Scripts\Layouts\DefaultLayouts.cs" Link="Layouts\DefaultLayouts.cs" />
+    </ItemGroup>
+
+    <!--
+        빌드 후 게임 폴더에 설치:
+          Mods/      ← 모드 본체 (MelonLoader가 모드로 불러옴)
+          UserLibs/  ← 모드가 쓰는 라이브러리 (Tactile.Core, Tactile.Adapters.Unity)
+    -->
+    <Target Name="DeployToGame" AfterTargets="Build" Condition="'$(Deploy)' == 'true' And Exists('$(GameDir)/MelonLoader')">
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameDir)/Mods" />
+        <Copy SourceFiles="$(OutDir)Tactile.Core.dll;$(OutDir)Tactile.Adapters.Unity.dll" DestinationFolder="$(GameDir)/UserLibs" />
+        <Message Importance="high" Text="Tactile → $(GameDir)/Mods, UserLibs" />
+    </Target>
+
+</Project>

@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="Tactile.Adapters.Godot/Tactile.Adapters.Godot.csproj" />
+  <Project Path="Tactile.Adapters.Unity/Tactile.Adapters.Unity.csproj" />
+  <Project Path="Tactile.ADOFAI/Tactile.ADOFAI.csproj" />
+  <Project Path="Tactile.Core/Tactile.Core.csproj" />
+  <Project Path="Tactile.Standalone/Tactile.Standalone.csproj">
+    <BuildType Project="Debug" />
+  </Project>
+</Solution>

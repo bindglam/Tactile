@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cpmxvtimhb1s2"]
+
+[ext_resource type="Script" uid="uid://cmt2jg2namlf1" path="res://Scripts/Viewer/KeyViewerHost.cs" id="1_host"]
+
+[node name="Main" type="Node2D" unique_id=630929562]
+script = ExtResource("1_host")

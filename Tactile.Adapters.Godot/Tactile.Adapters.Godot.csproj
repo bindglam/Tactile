@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            컴파일에 사용할 GodotSharp 버전.
+            .NET 8 기준이 된 4.4 이상이면 이후 버전의 Godot에서도 대부분 그대로 동작함.
+            특정 버전이 필요하면 `dotnet build -p:GodotVersion=4.7.2`처럼 바꿔서 빌드.
+        -->
+        <GodotVersion Condition="'$(GodotVersion)' == ''">4.4.0</GodotVersion>
+
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- 컴파일 전용. GodotSharp.dll은 게임 쪽에 이미 있으므로 출력에 복사하지 않음 -->
+        <PackageReference Include="GodotSharp" Version="$(GodotVersion)" PrivateAssets="all" ExcludeAssets="runtime" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Tactile.Core\Tactile.Core.csproj" />
+    </ItemGroup>
+
+</Project>

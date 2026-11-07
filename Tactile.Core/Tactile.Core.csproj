@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            Unity(Mono / IL2CPP), Godot .NET, 일반 .NET 앱에서 모두 로드되도록 netstandard2.0을 대상으로 함.
+            외부 패키지 의존성은 두지 않음 (모드 로더 환경에서 DLL 충돌 방지).
+        -->
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+</Project>
