@@ -28,4 +28,24 @@ public sealed class KeyViewerLayout
 
     /// <summary>화면 요소. 목록 순서대로 그리며, 나중 요소가 위에 그려집니다.</summary>
     public List<LayoutElement> Elements { get; set; } = [];
+
+    /// <summary>
+    /// 레이아웃에 함께 넣은 리소스 (이미지 등). 요소가 <see cref="LayoutAsset.Id"/>로 가리킵니다.
+    /// 크기가 커질 수 있어 파일의 맨 뒤에 저장합니다.
+    /// </summary>
+    public List<LayoutAsset> Assets { get; set; } = [];
+
+    /// <summary>이름으로 리소스를 찾습니다. 없으면 null.</summary>
+    public LayoutAsset? FindAsset(string? id)
+    {
+        if (id is null)
+            return null;
+        foreach (LayoutAsset asset in Assets)
+        {
+            if (asset.Id == id)
+                return asset;
+        }
+
+        return null;
+    }
 }

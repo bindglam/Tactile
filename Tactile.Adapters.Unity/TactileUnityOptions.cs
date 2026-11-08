@@ -15,7 +15,10 @@ public sealed class TactileUnityOptions
     /// <summary>렌더러 등록표. null이면 <see cref="UnityRenderers.CreateDefault"/>로 만든 새 등록표를 사용합니다.</summary>
     public RendererRegistry<UnityRenderContext>? Renderers { get; set; }
 
-    /// <summary>이미지 키(<c>BoxStyle.SpriteKey</c>)를 텍스처로 바꾸는 함수.</summary>
+    /// <summary>
+    /// 이미지 키(<c>BoxStyle.SpriteKey</c>)를 텍스처로 바꾸는 함수. null을 돌려주거나 지정하지 않으면
+    /// 레이아웃 리소스(<c>KeyViewerLayout.Assets</c>)에서 같은 이름의 이미지(PNG, JPG)를 찾습니다.
+    /// </summary>
     public Func<string, Texture?>? TextureResolver { get; set; }
 
     /// <summary>글자 폰트. null이면 Unity 내장 폰트를 사용합니다.</summary>

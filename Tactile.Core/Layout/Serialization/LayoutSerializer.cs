@@ -26,7 +26,7 @@ namespace Tactile.Core.Layout.Serialization;
 /// </para>
 /// <para>
 /// 지원하는 값: bool, 정수, 실수, string, enum(이름), <see cref="Color"/>(<c>"#RRGGBBAA"</c>), <see cref="Vector2"/>, <see cref="Vector3"/>,
-/// <see cref="Rect"/>, <see cref="InputBinding"/>(<c>"Keyboard.A"</c>), <see cref="List{T}"/>, 배열, nullable, 공개 속성을 가진 클래스·구조체.
+/// <see cref="Rect"/>, <see cref="InputBinding"/>(<c>"Keyboard.A"</c>), byte[](base64 문자열), <see cref="List{T}"/>, 배열, nullable, 공개 속성을 가진 클래스·구조체.
 /// </para>
 /// </summary>
 public static class LayoutSerializer
@@ -140,6 +140,8 @@ public static class LayoutSerializer
                 return Obj(("x", Number(rect.X)), ("y", Number(rect.Y)), ("width", Number(rect.Width)), ("height", Number(rect.Height)));
             if (value is InputBinding binding)
                 return new JsonString(binding.ToString());
+            if (value is byte[] bytes)
+                return new JsonString(Convert.ToBase64String(bytes));
 
             if (value is IList list)
             {
@@ -235,6 +237,8 @@ public static class LayoutSerializer
 
             if (type == typeof(InputBinding))
                 return ReadBinding(node, path);
+            if (type == typeof(byte[]))
+                return ReadBytes(node, path);
 
             if (type.IsArray || (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)))
                 return ReadList(node, type, path);
@@ -380,6 +384,20 @@ public static class LayoutSerializer
                 throw Fail($"알 수 없는 키입니다: {codeName}", node, path);
 
             return new InputBinding((InputSource)source, code);
+        }
+
+        private static byte[] ReadBytes(JsonNode node, string path)
+        {
+            if (node is not JsonString s)
+                throw Fail("base64 문자열이어야 합니다", node, path);
+            try
+            {
+                return Convert.FromBase64String(s.Value);
+            }
+            catch (FormatException)
+            {
+                throw Fail("올바른 base64 문자열이 아닙니다", node, path);
+            }
         }
 
         private static object ReadEnum(JsonNode node, Type type, string path)
@@ -533,6 +551,6 @@ public static class LayoutSerializer
     /// <summary>속성 단위로 읽고 쓰는 일반 클래스·구조체인지 (기본 지원 값 형식이 아닌 것).</summary>
     private static bool IsPlainObject(Type type) =>
         !type.IsPrimitive && !type.IsEnum && type != typeof(string) && type != typeof(Color) && type != typeof(Vector2)
-        && type != typeof(Vector3) && type != typeof(Rect) && type != typeof(InputBinding)
+        && type != typeof(Vector3) && type != typeof(Rect) && type != typeof(InputBinding) && type != typeof(byte[])
         && !typeof(LayoutElement).IsAssignableFrom(type) && ItemType(type) is null;
 }

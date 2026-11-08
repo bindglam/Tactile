@@ -12,6 +12,7 @@ using Tactile.Core.Input;
 using Tactile.Core.Input.Keyboard;
 using Tactile.Standalone.App;
 using Tactile.Standalone.Layouts;
+using CoreColor = Tactile.Core.Primitives.Color;
 using CoreRect = Tactile.Core.Primitives.Rect;
 using CoreVector2 = Tactile.Core.Primitives.Vector2;
 
@@ -42,6 +43,8 @@ public sealed partial class EditorScreen : Control
     private AcceptDialog _alert = null!;
     private Action? _afterConfirm;
 
+    private readonly GodotAssetTextures _textures = new(); // 미리보기를 다시 만들어도 이미지는 다시 디코딩하지 않음
+    private FileDialog _importDialog = null!;
     private TactileGodotViewer? _preview;
     private bool _active;
     private bool _previewDirty = true;
@@ -67,6 +70,7 @@ public sealed partial class EditorScreen : Control
         _saveDialog = GetNode<FileDialog>("%SaveDialog");
         _confirmDiscard = GetNode<ConfirmationDialog>("%ConfirmDiscard");
         _alert = GetNode<AcceptDialog>("%Alert");
+        _importDialog = GetNode<FileDialog>("%ImportDialog");
 
         GetNode<MenuButton>("%FileMenu").GetPopup().IdPressed += OnFileMenu;
         _addMenu.GetPopup().IdPressed += id => AddElement(_creatable[(int)id]);
@@ -86,6 +90,13 @@ public sealed partial class EditorScreen : Control
 
         _openDialog.FileSelected += path => ConfirmDiscard(() => Open(path));
         _saveDialog.FileSelected += path => Save(path);
+        _importDialog.FilesSelected += paths => ImportImages(paths);
+        GetNode<Button>("%ImportImage").Pressed += () => _importDialog.PopupCentered();
+        GetWindow().FilesDropped += paths =>
+        {
+            if (_active)
+                ImportImages(paths);
+        };
 
         // ConfirmationDialog는 버튼이 둘(저장/취소)뿐이라 세 번째 버튼만 여기서 붙임
         _confirmDiscard.AddButton("저장 안 함", right: false, action: "discard");
@@ -110,7 +121,7 @@ public sealed partial class EditorScreen : Control
         _document = document;
         _keyboard = keyboard;
         _canvas.Initialize(document);
-        _inspector.Initialize(document, keyboard);
+        _inspector.Initialize(document, keyboard, _textures);
 
         // 추가 메뉴 항목은 등록표에 따라 달라짐 (애드온 요소)
         _creatable = ElementFactory.CreatableTypes(_registry);
@@ -272,7 +283,7 @@ public sealed partial class EditorScreen : Control
         ClosePreview();
         try
         {
-            _preview = new TactileGodotViewer(_canvas.Stage, _document.Layout, _keyboard, new TactileGodotOptions { Elements = _registry });
+            _preview = new TactileGodotViewer(_canvas.Stage, _document.Layout, _keyboard, new TactileGodotOptions { Elements = _registry, AssetTextures = _textures });
             _preview.Root.Scale = Vector2.One; // 확대는 캔버스가 Stage에 적용
             _canvas.ShowMessage(_preview.Viewer.UnsupportedElements.Count > 0
                 ? $"그릴 수 없는 요소 {_preview.Viewer.UnsupportedElements.Count}개 (등록되지 않은 종류)는 테두리만 보입니다."
@@ -461,6 +472,52 @@ public sealed partial class EditorScreen : Control
     }
 
     /// <summary>알림 창.</summary>
+    /// <summary>
+    /// 이미지 파일들을 레이아웃 리소스로 가져옵니다 (가져오기 버튼, 창에 끌어 놓기).
+    /// 요소를 선택한 상태에서 이미지 하나를 가져오면 그 요소들의 기본 상태 이미지로 바로 씁니다.
+    /// </summary>
+    private void ImportImages(IEnumerable<string> paths)
+    {
+        (List<LayoutAsset> added, List<string> errors) = AssetTools.ImportImages(_document.Layout, paths);
+        if (added.Count > 0)
+        {
+            if (added.Count == 1)
+                ApplySprite(added[0].Id);
+            _document.Commit(DocumentChange.Values | DocumentChange.Structure);
+        }
+
+        if (errors.Count > 0)
+            Alert("가져오지 못한 파일", string.Join("\n", errors));
+    }
+
+    /// <summary>
+    /// 선택한 요소들의 기본 모양에 이미지를 지정합니다 (키: 보통 상태, 통계: 모양).
+    /// 이미지에는 채우기 색이 곱해지므로 원래 색대로 보이게 흰색으로 바꿉니다.
+    /// </summary>
+    private void ApplySprite(string id)
+    {
+        foreach (LayoutElement element in _document.SelectedElements)
+        {
+            switch (element)
+            {
+                case KeyElement key:
+                    KeyStyle style = key.Style;
+                    BoxStyle normal = style.Normal;
+                    normal.SpriteKey = id;
+                    normal.Fill = CoreColor.White;
+                    style.Normal = normal;
+                    key.Style = style;
+                    break;
+                case StatElement stat:
+                    BoxStyle look = stat.Look;
+                    look.SpriteKey = id;
+                    look.Fill = CoreColor.White;
+                    stat.Look = look;
+                    break;
+            }
+        }
+    }
+
     public void Alert(string title, string text)
     {
         _alert.Title = title;

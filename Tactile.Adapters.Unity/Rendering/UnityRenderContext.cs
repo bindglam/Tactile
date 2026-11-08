@@ -11,10 +11,10 @@ namespace Tactile.Adapters.Unity.Rendering;
 /// </summary>
 public sealed class UnityRenderContext
 {
-    internal UnityRenderContext(RectTransform root, TactileUnityOptions options)
+    internal UnityRenderContext(RectTransform root, TactileUnityOptions options, Func<string, Texture?> textureResolver)
     {
         Root = root;
-        TextureResolver = options.TextureResolver;
+        TextureResolver = textureResolver;
         Font = options.Font ?? LoadBuiltinFont();
         HandsLayer = options.HandsLayer;
         KeepAcrossScenes = options.KeepAcrossScenes;

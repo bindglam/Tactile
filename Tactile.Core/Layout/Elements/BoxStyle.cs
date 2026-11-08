@@ -13,8 +13,11 @@ public struct BoxStyle
     public float FontSize { get; set; }
 
     /// <summary>
-    /// 이미지로 그릴 때의 키. 엔진 연결 코드가 실제 텍스처와 연결합니다. null이면 단색 사각형으로 그립니다.
+    /// 이미지로 그릴 때의 키. 기본으로 레이아웃 리소스(<see cref="KeyViewerLayout.Assets"/>)의 같은 이름 이미지를 쓰고,
+    /// 엔진 연결 코드가 다른 텍스처로 바꿀 수도 있습니다. null이면 단색 사각형으로 그립니다.
+    /// 이미지에는 <see cref="Fill"/> 색을 곱합니다 (원래 색 그대로 쓰려면 흰색).
     /// </summary>
+    [AssetReference(LayoutAsset.ImageType)]
     public string? SpriteKey { get; set; }
 
     /// <summary>두 상태를 t(0~1) 비율로 섞습니다. 이미지 키는 중간(0.5)을 기준으로 바뀝니다.</summary>

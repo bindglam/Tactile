@@ -93,10 +93,10 @@ layout_mode = 2
 tooltip_text = "선택한 요소 삭제 (Delete)"
 text = "삭제"
 
-[node name="Sep3" type="VSeparator" parent="Root/Toolbar/Box"]
+[node name="Sep3" type="VSeparator" parent="Root/Toolbar/Box" unique_id=644208971]
 layout_mode = 2
 
-[node name="Snap" type="CheckButton" parent="Root/Toolbar/Box"]
+[node name="Snap" type="CheckButton" parent="Root/Toolbar/Box" unique_id=596221895]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "끌 때 다른 요소와 캔버스의 가장자리·중앙에 맞춥니다 (Alt를 누르고 끌면 잠시 꺼짐)"
@@ -141,10 +141,10 @@ theme_override_font_sizes/font_size = 12
 text = "  요소 (아래쪽이 위에 그려짐 · Shift/⌘로 여러 개)"
 
 [node name="Elements" type="ItemList" parent="Root/Split/Left" unique_id=715788743]
-select_mode = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
+select_mode = 1
 
 [node name="Order" type="HBoxContainer" parent="Root/Split/Left" unique_id=958333409]
 layout_mode = 2
@@ -266,6 +266,38 @@ layout_mode = 2
 tooltip_text = "모든 요소가 들어가도록 캔버스 크기를 맞춥니다 (가장자리 여백 유지)"
 text = "캔버스를 요소에 맞추기"
 
+[node name="AssetSeparator" type="HSeparator" parent="Root/Split/Right/Inspector/Margin/Content/LayoutFooter" unique_id=693925177]
+layout_mode = 2
+
+[node name="AssetsTitle" type="Label" parent="Root/Split/Right/Inspector/Margin/Content/LayoutFooter" unique_id=1865528738]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "리소스"
+
+[node name="AssetsHint" type="Label" parent="Root/Split/Right/Inspector/Margin/Content/LayoutFooter" unique_id=1766909895]
+modulate = Color(1, 1, 1, 0.65)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "레이아웃 파일에 함께 저장되는 이미지입니다. 요소의 \"이미지\" 칸에서 고르세요 (채우기 색이 곱해지므로 원래 색은 흰색). 파일을 창에 끌어 놓아도 가져오고, 요소를 선택한 채 하나를 가져오면 그 요소에 바로 씁니다."
+autowrap_mode = 3
+
+[node name="AssetsEmpty" type="Label" parent="Root/Split/Right/Inspector/Margin/Content/LayoutFooter" unique_id=819187613]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.65)
+layout_mode = 2
+text = "(없음)"
+
+[node name="Assets" type="VBoxContainer" parent="Root/Split/Right/Inspector/Margin/Content/LayoutFooter" unique_id=1228047156]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ImportImage" type="Button" parent="Root/Split/Right/Inspector/Margin/Content/LayoutFooter" unique_id=1308256698]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "PNG, JPG, WebP, BMP, SVG (얼불춤 모드는 PNG·JPG만 표시)"
+text = "이미지 가져오기…"
+
 [node name="FooterSeparator" type="HSeparator" parent="Root/Split/Right/Inspector/Margin/Content/LayoutFooter" unique_id=1453940955]
 layout_mode = 2
 
@@ -307,6 +339,16 @@ ok_button_text = "열기"
 file_mode = 0
 access = 2
 filters = PackedStringArray("*.json ; 레이아웃 파일")
+use_native_dialog = true
+
+[node name="ImportDialog" type="FileDialog" parent="." unique_id=985903455]
+unique_name_in_owner = true
+title = "Open File(s)"
+size = Vector2i(800, 500)
+ok_button_text = "가져오기"
+file_mode = 1
+access = 2
+filters = PackedStringArray("*.png, *.jpg, *.jpeg, *.webp, *.bmp, *.svg ; 이미지")
 use_native_dialog = true
 
 [node name="SaveDialog" type="FileDialog" parent="." unique_id=1227392819]

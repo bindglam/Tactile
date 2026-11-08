@@ -29,6 +29,8 @@ public enum DocumentChange
 /// 편집 중인 레이아웃 하나: 선택(여러 개 가능), 파일 경로, 저장 여부, 되돌리기/다시 실행.
 /// <para>
 /// 되돌리기는 바뀔 때마다 레이아웃을 직렬화한 스냅샷을 쌓는 방식입니다 (레이아웃이 작아서 충분히 빠름).
+/// 리소스(<see cref="KeyViewerLayout.Assets"/>)는 클 수 있어 직렬화하지 않고 객체 목록만 보관합니다
+/// (리소스 객체는 바꾸지 않고 교체하므로 공유해도 안전).
 /// 같은 값을 연속으로 바꾸는 경우(숫자 끌기, 요소 드래그)는 <c>mergeKey</c>로 한 단계로 합칩니다.
 /// </para>
 /// </summary>
@@ -38,10 +40,10 @@ public sealed class LayoutDocument
     private static readonly TimeSpan MergeWindow = TimeSpan.FromSeconds(1.5);
 
     private readonly List<int> _selection = new();
-    private readonly List<string> _undo = new();
-    private readonly List<string> _redo = new();
-    private string _current;
-    private string _saved;
+    private readonly List<Snapshot> _undo = new();
+    private readonly List<Snapshot> _redo = new();
+    private Snapshot _current;
+    private Snapshot? _saved;
     private string? _lastMergeKey;
     private DateTime _lastMergeTime;
 
@@ -49,7 +51,8 @@ public sealed class LayoutDocument
     {
         Layout = layout;
         Path = path;
-        _current = _saved = LayoutSerializer.Save(layout);
+        _current = Snapshot.Of(layout);
+        _saved = _current;
     }
 
     /// <summary>바뀐 것을 알립니다.</summary>
@@ -82,7 +85,7 @@ public sealed class LayoutDocument
     public bool IsSelected(int index) => _selection.BinarySearch(index) >= 0;
 
     /// <summary>저장한 뒤 바뀐 것이 있는지.</summary>
-    public bool IsDirty => _current != _saved;
+    public bool IsDirty => _saved is null || !_current.Equals(_saved);
 
     public bool CanUndo => _undo.Count > 0;
 
@@ -124,8 +127,8 @@ public sealed class LayoutDocument
     /// <param name="mergeKey">같은 키로 연달아 바꾸면 한 단계로 합침 (null이면 합치지 않음)</param>
     public void Commit(DocumentChange change, string? mergeKey = null)
     {
-        string snapshot = LayoutSerializer.Save(Layout);
-        if (snapshot == _current)
+        Snapshot snapshot = Snapshot.Of(Layout);
+        if (snapshot.Equals(_current))
         {
             if (change != DocumentChange.None)
                 Changed?.Invoke(change); // 값은 같아도 화면 갱신은 필요할 수 있음 (드래그 중 등)
@@ -160,8 +163,8 @@ public sealed class LayoutDocument
     {
         Layout = layout;
         Path = path;
-        _current = LayoutSerializer.Save(layout);
-        _saved = saved ? _current : "";
+        _current = Snapshot.Of(layout);
+        _saved = saved ? _current : null;
         _undo.Clear();
         _redo.Clear();
         _lastMergeKey = null;
@@ -176,11 +179,12 @@ public sealed class LayoutDocument
         path ??= Path;
         LayoutSerializer.SaveFile(Layout, path);
         Path = path;
-        _saved = _current = LayoutSerializer.Save(Layout);
+        _current = Snapshot.Of(Layout);
+        _saved = _current;
         Changed?.Invoke(DocumentChange.File);
     }
 
-    private void Restore(List<string> from, List<string> to)
+    private void Restore(List<Snapshot> from, List<Snapshot> to)
     {
         if (from.Count == 0)
             return;
@@ -190,8 +194,55 @@ public sealed class LayoutDocument
         from.RemoveAt(from.Count - 1);
         _lastMergeKey = null;
 
-        Layout = LayoutSerializer.Load(_current);
+        Layout = _current.Restore();
         _selection.RemoveAll(index => index >= Layout.Elements.Count);
         Changed?.Invoke(DocumentChange.Structure | DocumentChange.Selection | DocumentChange.File);
+    }
+
+    /// <summary>되돌리기 한 단계: 리소스를 뺀 레이아웃 JSON + 리소스 객체 목록.</summary>
+    private sealed class Snapshot
+    {
+        private readonly string _json;
+        private readonly LayoutAsset[] _assets;
+
+        private Snapshot(string json, LayoutAsset[] assets)
+        {
+            _json = json;
+            _assets = assets;
+        }
+
+        public static Snapshot Of(KeyViewerLayout layout)
+        {
+            List<LayoutAsset> assets = layout.Assets;
+            layout.Assets = new List<LayoutAsset>();
+            try
+            {
+                return new Snapshot(LayoutSerializer.Save(layout), assets.ToArray());
+            }
+            finally
+            {
+                layout.Assets = assets;
+            }
+        }
+
+        public KeyViewerLayout Restore()
+        {
+            KeyViewerLayout layout = LayoutSerializer.Load(_json);
+            layout.Assets = new List<LayoutAsset>(_assets);
+            return layout;
+        }
+
+        public bool Equals(Snapshot other)
+        {
+            if (_json != other._json || _assets.Length != other._assets.Length)
+                return false;
+            for (int i = 0; i < _assets.Length; i++)
+            {
+                if (!ReferenceEquals(_assets[i], other._assets[i]))
+                    return false;
+            }
+
+            return true;
+        }
     }
 }

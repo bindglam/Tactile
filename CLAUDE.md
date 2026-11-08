@@ -61,6 +61,10 @@ scripts/build.py adofai standalone -v 0.2.0   # 독립 앱은 Tactile.Standalone
 
 `LayoutSerializer`가 `KeyViewerLayout`을 JSON으로 저장·불러옵니다. netstandard2.0에 `System.Text.Json`이 없어 `Json.cs`에 최소 JSON 리더(주석·끝 쉼표 허용, 줄 번호 오류)/라이터를 직접 두었습니다. 요소는 `"type"`에 `ElementRegistry` 종류 ID를 쓰고, 나머지는 리플렉션으로 공개 get/public set 속성을 camelCase로 저장합니다 (애드온 요소도 등록만으로 저장됨, 제외는 `[LayoutIgnore]`, 매개변수 없는 생성자 필요). 기본 지원 값이 아닌 읽기 전용 형식(`Color`, `Rect`, `Vector2/3`, `InputBinding`)은 직렬화기에 직접 변환 코드가 있습니다. 불러올 때 파일에 없는 속성은 기본값 유지(스타일 객체·구조체는 기본값 위에 덮어씀), 등록되지 않은 종류는 `UnknownElement`로 원본을 보존해 다시 저장합니다. Standalone은 `user://layout.json`, 모드는 `UserData/Tactile/layout.json`을 읽고, 없으면 기본 레이아웃을 저장합니다.
 
+### 리소스 (이미지)
+
+`KeyViewerLayout.Assets`(`LayoutAsset`: id, type `"image"`/`"sound"`, format, `byte[] Data`)는 레이아웃 파일 맨 뒤에 base64로 저장됩니다 (직렬화기가 `byte[]`를 base64 문자열로 변환). 요소는 `[AssetReference("image")]`가 붙은 string 속성(`BoxStyle.SpriteKey`)으로 id를 가리키며, 에디터는 이 표시로 선택 칸을 만들고 이름 바꾸기·지우기 때 참조를 고칩니다(`AssetTools`). 엔진은 `TextureResolver`를 먼저 쓰고, 없으면 레이아웃 리소스에서 찾습니다 (`GodotAssetTextures` — 약한 참조 캐시, 에디터는 하나를 미리보기와 공유 / `UnityAssetTextures` — 뷰어가 해제, PNG·JPG만). `LayoutAsset`은 되돌리기 기록과 공유하므로 바꾸지 말고 교체합니다 (`WithId`). `LayoutDocument` 스냅샷은 리소스를 빼고 직렬화해 객체 참조만 보관합니다.
+
 ### 입력
 
 플랫폼별 장치는 `KeyboardDevice`(수집 스레드 + 큐)를 상속하고, `PlatformKeyboard.Create()`가 현재 OS의 장치를 고릅니다. 공용 `KeyCode`는 USB HID 위치 기준입니다.

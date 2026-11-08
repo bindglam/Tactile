@@ -37,7 +37,7 @@ public static class Names
         ["BorderWidth"] = "테두리 두께",
         ["CornerRadius"] = "모서리 둥글기",
         ["FontSize"] = "글자 크기",
-        ["SpriteKey"] = "이미지 키",
+        ["SpriteKey"] = "이미지",
         ["Fingers"] = "손가락 연결",
         ["Background"] = "배경",
         ["HandColor"] = "손 색",

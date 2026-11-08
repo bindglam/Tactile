@@ -31,6 +31,7 @@ public sealed class TactileUnityViewer : IDisposable
     private readonly IInputDevice<KeyboardEvent> _keyboard;
     private readonly bool _ownsKeyboard;
     private readonly GameObject _canvasObject;
+    private readonly UnityAssetTextures _assetTextures = new();
     private bool _disposed;
 
     /// <summary>현재 플랫폼의 키보드 장치(<see cref="CreatePlatformKeyboard"/>)를 만들어 사용합니다. 장치는 이 객체가 시작하고 해제합니다.</summary>
@@ -70,7 +71,9 @@ public sealed class TactileUnityViewer : IDisposable
         try
         {
             RendererRegistry<UnityRenderContext> renderers = options.Renderers ?? UnityRenderers.CreateDefault();
-            var context = new UnityRenderContext(Root, options);
+            Func<string, Texture?>? custom = options.TextureResolver;
+            Func<string, Texture?> resolver = key => custom?.Invoke(key) ?? _assetTextures.Get(layout.FindAsset(key));
+            var context = new UnityRenderContext(Root, options, resolver);
             viewer = new KeyViewer(layout, keyboard, options.Elements, renderers.Bind(context), options.RainCapacity);
             if (ownsKeyboard)
                 keyboard.Start();
@@ -79,6 +82,7 @@ public sealed class TactileUnityViewer : IDisposable
         {
             viewer?.Dispose();
             UnityEngine.Object.Destroy(_canvasObject);
+            _assetTextures.Dispose();
             if (ownsKeyboard)
                 keyboard.Dispose();
             throw;
@@ -125,6 +129,7 @@ public sealed class TactileUnityViewer : IDisposable
         Viewer.Dispose();
         if (_canvasObject != null)
             UnityEngine.Object.Destroy(_canvasObject);
+        _assetTextures.Dispose();
     }
 
     /// <summary>

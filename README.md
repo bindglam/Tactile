@@ -109,14 +109,21 @@ KeyViewerLayout layout = LayoutSerializer.LoadFile("layout.json");
       "bounds": { "x": 20, "y": 320, "width": 80, "height": 80 },
       "bindings": ["Keyboard.Tab"],
       "label": "Tab",
-      "style": { "pressed": { "fill": "#7FD3FFF0" } }
+      "style": {
+        "normal": { "fill": "#FFFFFF", "spriteKey": "key-skin" },
+        "pressed": { "fill": "#7FD3FFF0" }
+      }
     }
+  ],
+  "assets": [
+    { "id": "key-skin", "type": "image", "format": "png", "data": "iVBORw0KGgo..." }
   ]
 }
 ```
 
 - 요소의 공개 속성을 그대로 저장하므로, 애드온 요소도 등록만 하면 따로 코드 없이 저장됩니다.
 - 애드온이 빠진 상태에서 불러온 요소는 내용을 보존했다가 다시 저장할 때 그대로 씁니다.
+- 이미지는 `assets`에 base64로 함께 들어가므로 파일 하나만 공유하면 됩니다. 요소는 `spriteKey`로 이름을 가리키고, 채우기 색이 곱해집니다. 독립 앱 에디터의 레이아웃 설정에서 가져오거나 창에 끌어 놓으면 됩니다. 얼불춤 모드(Unity)는 PNG·JPG만 표시합니다.
 - 독립 앱은 Godot 사용자 데이터 폴더의 `layout.json`, 얼불춤 모드는 `UserData/Tactile/layout.json`을 읽습니다. 파일이 없으면 기본 레이아웃을 그 자리에 만들어 둡니다.
 
 ## 얼불춤 모드

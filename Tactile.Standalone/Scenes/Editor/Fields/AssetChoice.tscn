@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[sub_resource type="Theme" id="Theme_popup"]
+PopupMenu/constants/icon_max_width = 24
+
+[node name="AssetChoice" type="OptionButton"]
+size_flags_horizontal = 3
+tooltip_text = "레이아웃 설정의 리소스에서 고릅니다"
+theme = SubResource("Theme_popup")
+theme_override_constants/icon_max_width = 20
+fit_to_longest_item = false

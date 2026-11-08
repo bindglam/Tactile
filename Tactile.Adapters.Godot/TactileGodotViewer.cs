@@ -82,7 +82,7 @@ public sealed class TactileGodotViewer : IDisposable
         {
             options ??= new TactileGodotOptions();
             RendererRegistry<GodotRenderContext> renderers = options.Renderers ?? GodotRenderers.CreateDefault();
-            var context = new GodotRenderContext(_root, options.TextureResolver);
+            var context = new GodotRenderContext(_root, CreateTextureResolver(layout, options));
             viewer = new KeyViewer(layout, keyboard, options.Elements, renderers.Bind(context), options.RainCapacity);
             if (ownsKeyboard)
                 keyboard.Start();
@@ -125,6 +125,14 @@ public sealed class TactileGodotViewer : IDisposable
         Viewer.Dispose();
         if (GodotObject.IsInstanceValid(_root))
             _root.QueueFree();
+    }
+
+    /// <summary>직접 지정한 조회 함수를 먼저 쓰고, 없으면 레이아웃 리소스에서 찾습니다.</summary>
+    private static Func<string, Texture2D?> CreateTextureResolver(KeyViewerLayout layout, TactileGodotOptions options)
+    {
+        Func<string, Texture2D?>? custom = options.TextureResolver;
+        GodotAssetTextures textures = options.AssetTextures ?? new GodotAssetTextures();
+        return key => custom?.Invoke(key) ?? textures.Get(layout.FindAsset(key));
     }
 
     /// <summary>현재 운영체제의 전역 키보드 장치 (macOS, Windows). 그 밖의 운영체제는 <see cref="PlatformNotSupportedException"/>.</summary>

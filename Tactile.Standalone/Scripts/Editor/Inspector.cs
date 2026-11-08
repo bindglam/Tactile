@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Godot;
+using Tactile.Adapters.Godot;
 using Tactile.Core.Input.Keyboard;
 using Tactile.Core.Layout;
 using Tactile.Core.Layout.Elements;
@@ -41,9 +42,10 @@ public sealed partial class Inspector : ScrollContainer
 
     private LayoutDocument _document = null!;
     private SharedKeyboard _keyboard = null!;
+    private GodotAssetTextures _textures = null!;
 
-    private Label _title = null!, _subtitle = null!, _notice = null!, _summary = null!;
-    private VBoxContainer _fields = null!;
+    private Label _title = null!, _subtitle = null!, _notice = null!, _summary = null!, _assetsEmpty = null!;
+    private VBoxContainer _fields = null!, _assets = null!;
     private Control _layoutFooter = null!;
 
     // "키 눌러서 지정" 중인 칸
@@ -60,14 +62,17 @@ public sealed partial class Inspector : ScrollContainer
         _notice = GetNode<Label>("%Notice");
         _summary = GetNode<Label>("%Summary");
         _fields = GetNode<VBoxContainer>("%Fields");
+        _assets = GetNode<VBoxContainer>("%Assets");
+        _assetsEmpty = GetNode<Label>("%AssetsEmpty");
         _layoutFooter = GetNode<Control>("%LayoutFooter");
         GetNode<Button>("%FitCanvas").Pressed += () => FitCanvasRequested?.Invoke();
     }
 
-    public void Initialize(LayoutDocument document, SharedKeyboard keyboard)
+    public void Initialize(LayoutDocument document, SharedKeyboard keyboard, GodotAssetTextures textures)
     {
         _document = document;
         _keyboard = keyboard;
+        _textures = textures;
         _keyboard.KeyPressed += OnKeyPressed;
     }
 
@@ -118,11 +123,66 @@ public sealed partial class Inspector : ScrollContainer
         var root = new Accessor(typeof(KeyViewerLayout), new[] { new Target(() => _document.Layout, _ => { }) }, "layout");
         foreach (PropertyInfo property in EditableProperties(typeof(KeyViewerLayout)))
         {
-            if (property.Name is nameof(KeyViewerLayout.Version) or nameof(KeyViewerLayout.Elements))
+            if (property.Name is nameof(KeyViewerLayout.Version) or nameof(KeyViewerLayout.Elements) or nameof(KeyViewerLayout.Assets))
                 continue;
             _fields.AddChild(BuildProperty(root.Child(property), 0));
         }
+
+        FillAssets();
     }
+
+    /// <summary>리소스 목록 (레이아웃 설정 아래): 미리보기, 이름(바꾸면 쓰는 곳도 함께), 정보, 지우기.</summary>
+    private void FillAssets()
+    {
+        foreach (Node child in _assets.GetChildren())
+        {
+            _assets.RemoveChild(child);
+            child.QueueFree();
+        }
+
+        KeyViewerLayout layout = _document.Layout;
+        _assetsEmpty.Visible = layout.Assets.Count == 0;
+
+        foreach (LayoutAsset asset in layout.Assets)
+        {
+            var row = Field<HBoxContainer>("Asset");
+            var preview = row.GetNode<TextureRect>("Preview");
+            var id = row.GetNode<LineEdit>("Text/Id");
+            var info = row.GetNode<Label>("Text/Info");
+
+            Texture2D? texture = _textures.Get(asset);
+            preview.Texture = texture;
+            id.Text = asset.Id;
+
+            int uses = AssetTools.CountUses(layout, asset);
+            string size = texture is not null ? $" · {texture.GetWidth()}×{texture.GetHeight()}" : asset.IsImage ? " · 읽을 수 없음" : "";
+            string portable = asset.IsImage && !AssetTools.IsPortableImage(asset) ? " · ⚠ 모드 미지원" : "";
+            info.Text = $"{asset.Format.ToUpperInvariant()}{size} · {FormatBytes(asset.Data.Length)} · {(uses > 0 ? $"{uses}곳에서 사용" : "사용 안 함")}{portable}";
+            info.TooltipText = portable.Length > 0 ? "얼불춤 모드(Unity)는 PNG와 JPG만 표시합니다." : "";
+
+            void Rename()
+            {
+                if (!_document.Layout.Assets.Contains(asset))
+                    return; // 이미 바뀌어 다시 그리는 중
+                if (AssetTools.Rename(_document.Layout, asset, id.Text))
+                    _document.Commit(DocumentChange.Values | DocumentChange.Structure);
+                else
+                    id.Text = asset.Id; // 비었거나 겹치는 이름
+            }
+
+            id.TextSubmitted += _ => Rename();
+            id.FocusExited += Rename;
+            row.GetNode<Button>("Remove").Pressed += () =>
+            {
+                AssetTools.Remove(_document.Layout, asset);
+                _document.Commit(DocumentChange.Values | DocumentChange.Structure);
+            };
+            _assets.AddChild(row);
+        }
+    }
+
+    private static string FormatBytes(long bytes) =>
+        bytes >= 1024 * 1024 ? $"{bytes / 1024.0 / 1024.0:0.0}MB" : bytes >= 1024 ? $"{bytes / 1024.0:0.#}KB" : $"{bytes}B";
 
     private string Summary() => $"요소 {_document.Layout.Elements.Count}개 · 캔버스에서 요소를 눌러 선택하세요.";
 
@@ -296,6 +356,8 @@ public sealed partial class Inspector : ScrollContainer
             return BuildOptional(accessor, nullable);
 
         Type type = accessor.Type;
+        if (type == typeof(string) && accessor.Property?.GetCustomAttribute<AssetReferenceAttribute>() is { } reference)
+            return BuildAssetChoice(accessor, reference.AssetType);
         if (type == typeof(string)) return BuildText(accessor);
         if (type == typeof(bool)) return BuildToggle(accessor);
         if (type == typeof(float) || type == typeof(double) || type == typeof(int) || type == typeof(long))
@@ -429,6 +491,42 @@ public sealed partial class Inspector : ScrollContainer
             return 1;
         bool fine = name.EndsWith("Strength", StringComparison.Ordinal) || name.EndsWith("Motion", StringComparison.Ordinal) || name == "Scale";
         return fine ? 0.01 : 0.1;
+    }
+
+    /// <summary>리소스를 가리키는 칸: "(없음)" + 같은 종류 리소스 목록. 목록에 없는 이름이면 "(없음)" 표시를 붙여 보여 줍니다.</summary>
+    private Control BuildAssetChoice(Accessor accessor, string assetType)
+    {
+        var option = Field<OptionButton>("AssetChoice");
+        var ids = new List<string?> { null };
+        option.AddItem("(없음)");
+        foreach (LayoutAsset asset in _document.Layout.Assets.Where(a => a.Type == assetType))
+        {
+            ids.Add(asset.Id);
+            option.AddItem(asset.Id);
+            if (_textures.Get(asset) is { } icon)
+                option.SetItemIcon(ids.Count - 1, icon);
+        }
+
+        foreach (string? missing in accessor.Values().Cast<string?>().Distinct())
+        {
+            if (missing is not null && !ids.Contains(missing))
+            {
+                ids.Add(missing);
+                option.AddItem($"{missing} (없는 리소스)");
+            }
+        }
+
+        void Read()
+        {
+            option.Select(accessor.IsMixed ? -1 : ids.IndexOf((string?)accessor.Get()));
+            if (accessor.IsMixed)
+                option.TooltipText = MixedText;
+        }
+
+        Read();
+        option.ItemSelected += index => Apply(accessor, ids[(int)index]);
+        _refreshers.Add(Read);
+        return option;
     }
 
     private Control BuildChoice(Accessor accessor)
