@@ -1,0 +1,44 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Overlay/OverlayScreen.cs" id="1_overlay"]
+
+[node name="Overlay" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 2
+script = ExtResource("1_overlay")
+
+[node name="Viewer" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Error" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+autowrap_mode = 3
+
+[node name="Menu" type="PopupMenu" parent="."]
+unique_name_in_owner = true
+item_count = 4
+item_0/text = "편집으로 돌아가기"
+item_0/id = 0
+item_1/text = "항상 위에 표시"
+item_1/checkable = 1
+item_1/id = 1
+item_2/id = 99
+item_2/separator = true
+item_3/text = "종료"
+item_3/id = 2

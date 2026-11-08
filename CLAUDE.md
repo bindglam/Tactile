@@ -37,7 +37,7 @@ scripts/build.py adofai standalone -v 0.2.0   # 독립 앱은 Tactile.Standalone
 - **Tactile.Adapters.Godot** (net8.0) / **Tactile.Adapters.Unity**: 엔진 패키지는 컴파일 전용 참조(출력에 복사 안 함).
 - **Tactile.Adapters.Unity**: UnityEngine.UI 없이 엔진 모듈만 참조합니다 (BepInEx 피드에 UI 패키지가 없고, 게임마다 UI 버전이 다름). 그래서 `CanvasRenderer`에 메시를 직접 넣고(`MeshView`), 글자는 `Font.GetCharacterInfo`로 직접 배치합니다 (`TextGenerator`/`UIVertex`는 Unity 버전마다 필드 형식이 달라 쓰지 않음). 오버레이 캔버스(`TactileUnityViewer`)에 그리고, macOS 외 플랫폼은 `UnityLegacyKeyboard`(프레임 단위 `Input.GetKey` 폴링)로 대신합니다. 손은 기본적으로 2D 선 메시(`UnityHandsRenderer`)로 그립니다. 선택용 `UnityHands3DRenderer`는 멀리 떨어진 위치·전용 레이어(기본 31)에 캡슐들과 꺼 둔 정사영 카메라를 두고 `RenderTexture`에 직접 `Render()`합니다 (Core 좌표의 z만 반전).
 - **Tactile.ADOFAI**: A Dance of Fire and Ice용 MelonLoader 모드 (`netstandard2.1`, Unity 6 Mono). 게임의 `Managed/`와 `MelonLoader/net35/`의 DLL을 `Private=false`로 참조합니다 (macOS는 `.app/Contents/Resources/Data/Managed`). 레이아웃은 `UserData/Tactile/layout.json`에서 읽고, 없으면 Standalone의 `DefaultLayouts.cs`(링크)로 만든 기본 레이아웃을 저장합니다. 이 PC의 게임에는 Quartz(UMM 모드를 불러오는 MelonLoader 모드)가 함께 설치되어 있습니다.
-- **Tactile.Standalone**: Godot 앱. 어댑터의 `TactileGodotViewer`를 사용하는 얇은 호스트(`Scripts/Viewer/KeyViewerHost.cs`)와 기본 레이아웃(`Scripts/Layouts/DefaultLayouts.cs`).
+- **Tactile.Standalone**: Godot 앱 = 레이아웃 에디터 + 표시 창. UI는 씬에 노드로 배치합니다 (`Scenes/Main.tscn` → `Editor/Editor.tscn`, `Overlay.tscn`). 스크립트는 고유 이름(`%Name`)으로 노드를 찾아 동작만 연결하고, 코드로 컨트롤을 만들지 않습니다 — 요소마다 달라지는 속성 칸만 `Scenes/Editor/Fields/*.tscn`을 인스턴스합니다. 씬 스크립트는 매개변수 없는 생성자가 필요하므로 의존성은 `Initialize(...)`로 받습니다. 메인 씬 루트 `Scripts/App/TactileApp.cs`가 에디터(`Scripts/Editor/`)와 표시 화면(`Scripts/Overlay/`)을 오갑니다. Godot은 메인 창을 숨길 수 없어서, "표시"를 누르면 메인 창 자체를 테두리 없음·`TransparentBg`·키뷰어 크기로 바꾸고 돌아올 때 되돌립니다 (`project.godot`의 per-pixel 투명 설정과 `embed_subwindows=false` 필요). 배율은 `TactileApp.ContentScale()` 한 곳에서 `ContentScaleSize = 창 크기 / 배율`로 정합니다. 표시 창은 화면 배율만 써서 레이아웃 1px = 화면 논리 1px이고, 에디터는 여기에 창 크기 배율(1280×800보다 클 때 비례, 최대 2배)과 사용자 배율(⌘+ / ⌘− / ⌘0, `settings.cfg`의 `ui_zoom`)을 곱합니다. 에디터는 `LayoutDocument`(여러 개 선택, 레이아웃 파일 스냅샷으로 되돌리기/다시 실행, 같은 키 변경은 1.5초 안이면 합침)를 중심으로, 캔버스(`CanvasView`, 실제 `TactileGodotViewer` 미리보기 위에 선택·이동·크기 조절)와 직렬화기와 같은 규칙의 리플렉션 속성 편집기(`Inspector`, 한국어 이름은 `Names.cs`. 값 접근기 `Accessor`가 선택한 요소마다 대상을 하나씩 가져서, 같은 종류 여러 개면 다른 값은 "여러 값"으로 비우고 바꾸면 모두에 적용, 종류가 섞이면 묶음 위치만)를 둡니다. 키 입력 장치는 `SharedKeyboard` 하나를 에디터 미리보기·표시 창이 함께 씁니다. 레이아웃 파일은 마지막으로 연 파일(`user://settings.cfg`) → Godot 에디터에서 실행하면 `res://layout.json`, 내보낸 앱이면 `user://layout.json`.
 
 ## 아키텍처
 
@@ -74,6 +74,7 @@ ADOFAI Macro 3(github.com/CLiF-1593/ADOFAI_Macro_for_Publish, MIT)의 손 캠(`H
 ### Godot 어댑터 주의점
 
 - 라이브러리 클래스에서는 `_Draw`를 override할 수 없으므로 `Draw` 시그널 등을 사용합니다.
+- 코드로 만든 Control을 꽉 채울 때는 `SetAnchorsAndOffsetsPreset`을 씁니다 (`SetAnchorsPreset`은 지금 크기(0×0)를 유지하도록 오프셋을 바꿔 버림).
 - 선택용 3D 손(`GodotHands3DRenderer`)은 `SubViewport`(`OwnWorld3D`, 투명 배경, `UpdateMode.Once`)에 캡슐을 두고 `TextureRect`로 표시합니다. 음수 스케일은 조명이 깨지므로 쓰지 않습니다.
 
 ## 규칙

@@ -1,0 +1,332 @@
+[gd_scene format=3 uid="uid://dyqyv6e4syo7r"]
+
+[ext_resource type="Script" uid="uid://bkxap2uegbskt" path="res://Scripts/Editor/EditorScreen.cs" id="1_editor"]
+[ext_resource type="Script" uid="uid://d06q2p1quf77x" path="res://Scripts/Editor/CanvasView.cs" id="2_canvas"]
+[ext_resource type="Script" uid="uid://bgol8eebdt7dc" path="res://Scripts/Editor/Inspector.cs" id="3_inspector"]
+
+[node name="Editor" type="Control" unique_id=915531602]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_editor")
+
+[node name="Background" type="Panel" parent="." unique_id=1631587511]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Root" type="VBoxContainer" parent="." unique_id=658778708]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="Toolbar" type="PanelContainer" parent="Root" unique_id=129558220]
+layout_mode = 2
+
+[node name="Box" type="HBoxContainer" parent="Root/Toolbar" unique_id=1315169139]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="FileMenu" type="MenuButton" parent="Root/Toolbar/Box" unique_id=931214124]
+unique_name_in_owner = true
+layout_mode = 2
+text = "파일"
+flat = false
+item_count = 6
+popup/item_0/text = "새 레이아웃 (빈 캔버스)"
+popup/item_0/id = 0
+popup/item_1/text = "새 레이아웃 (기본 8키)"
+popup/item_1/id = 1
+popup/item_2/id = 99
+popup/item_2/separator = true
+popup/item_3/text = "열기…"
+popup/item_3/id = 2
+popup/item_4/text = "저장  ⌘S"
+popup/item_4/id = 3
+popup/item_5/text = "다른 이름으로 저장…"
+popup/item_5/id = 4
+
+[node name="Sep1" type="VSeparator" parent="Root/Toolbar/Box" unique_id=655002943]
+layout_mode = 2
+
+[node name="Undo" type="Button" parent="Root/Toolbar/Box" unique_id=511140258]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "되돌리기 (⌘Z)"
+text = "↶"
+
+[node name="Redo" type="Button" parent="Root/Toolbar/Box" unique_id=1343697319]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "다시 실행 (⌘⇧Z)"
+text = "↷"
+
+[node name="Sep2" type="VSeparator" parent="Root/Toolbar/Box" unique_id=2112796757]
+layout_mode = 2
+
+[node name="AddMenu" type="MenuButton" parent="Root/Toolbar/Box" unique_id=2076245175]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "등록된 요소 종류 (애드온 요소 포함)"
+text = "+ 요소 추가"
+flat = false
+
+[node name="Duplicate" type="Button" parent="Root/Toolbar/Box" unique_id=990407666]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "선택한 요소 복제 (⌘D)"
+text = "복제"
+
+[node name="Delete" type="Button" parent="Root/Toolbar/Box" unique_id=1876455594]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "선택한 요소 삭제 (Delete)"
+text = "삭제"
+
+[node name="Sep3" type="VSeparator" parent="Root/Toolbar/Box"]
+layout_mode = 2
+
+[node name="Snap" type="CheckButton" parent="Root/Toolbar/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "끌 때 다른 요소와 캔버스의 가장자리·중앙에 맞춥니다 (Alt를 누르고 끌면 잠시 꺼짐)"
+button_pressed = true
+text = "스냅"
+
+[node name="Spacer" type="Control" parent="Root/Toolbar/Box" unique_id=1405581586]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Permission" type="Label" parent="Root/Toolbar/Box" unique_id=379113338]
+unique_name_in_owner = true
+modulate = Color(1, 0.8, 0.45, 1)
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="OpenSettings" type="Button" parent="Root/Toolbar/Box" unique_id=1776728452]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+tooltip_text = "시스템 설정 → 개인정보 보호 및 보안 → 입력 모니터링"
+text = "권한 설정 열기"
+
+[node name="Show" type="Button" parent="Root/Toolbar/Box" unique_id=1966161012]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "에디터를 닫고 키뷰어만 투명한 창으로 띄웁니다"
+theme_override_colors/font_color = Color(0.5, 0.83, 1, 1)
+text = "▶  표시"
+
+[node name="Split" type="HSplitContainer" parent="Root" unique_id=1878468802]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Left" type="VBoxContainer" parent="Root/Split" unique_id=994564764]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+
+[node name="ListTitle" type="Label" parent="Root/Split/Left" unique_id=143657419]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "  요소 (아래쪽이 위에 그려짐 · Shift/⌘로 여러 개)"
+
+[node name="Elements" type="ItemList" parent="Root/Split/Left" unique_id=715788743]
+select_mode = 1
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Order" type="HBoxContainer" parent="Root/Split/Left" unique_id=958333409]
+layout_mode = 2
+
+[node name="MoveUp" type="Button" parent="Root/Split/Left/Order" unique_id=888210634]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "목록에서 위로 (더 아래에 그려짐)"
+text = "▲ 앞으로"
+
+[node name="MoveDown" type="Button" parent="Root/Split/Left/Order" unique_id=381669372]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "목록에서 아래로 (더 위에 그려짐)"
+text = "▼ 뒤로"
+
+[node name="Right" type="HSplitContainer" parent="Root/Split" unique_id=193330294]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Canvas" type="Control" parent="Root/Split/Right" unique_id=1692126429]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 2
+script = ExtResource("2_canvas")
+
+[node name="Stage" type="Control" parent="Root/Split/Right/Canvas" unique_id=1639411018]
+unique_name_in_owner = true
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="Selection" type="Control" parent="Root/Split/Right/Canvas" unique_id=547087011]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Message" type="Label" parent="Root/Split/Right/Canvas" unique_id=784414132]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 0.6, 0.6, 1)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = -60.0
+offset_right = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+autowrap_mode = 3
+
+[node name="Inspector" type="ScrollContainer" parent="Root/Split/Right" unique_id=116747462]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+horizontal_scroll_mode = 0
+script = ExtResource("3_inspector")
+
+[node name="Margin" type="MarginContainer" parent="Root/Split/Right/Inspector" unique_id=1350541943]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Content" type="VBoxContainer" parent="Root/Split/Right/Inspector/Margin" unique_id=1067420789]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Root/Split/Right/Inspector/Margin/Content" unique_id=15261408]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "레이아웃"
+
+[node name="Subtitle" type="Label" parent="Root/Split/Right/Inspector/Margin/Content" unique_id=1710444468]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.5)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "캔버스 크기와 전체 배율"
+
+[node name="TitleSeparator" type="HSeparator" parent="Root/Split/Right/Inspector/Margin/Content" unique_id=946745098]
+layout_mode = 2
+
+[node name="Notice" type="Label" parent="Root/Split/Right/Inspector/Margin/Content" unique_id=759493432]
+unique_name_in_owner = true
+visible = false
+modulate = Color(1, 1, 1, 0.65)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="Fields" type="VBoxContainer" parent="Root/Split/Right/Inspector/Margin/Content" unique_id=1579218169]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="LayoutFooter" type="VBoxContainer" parent="Root/Split/Right/Inspector/Margin/Content" unique_id=2049659000]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="FitCanvas" type="Button" parent="Root/Split/Right/Inspector/Margin/Content/LayoutFooter" unique_id=1566787951]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "모든 요소가 들어가도록 캔버스 크기를 맞춥니다 (가장자리 여백 유지)"
+text = "캔버스를 요소에 맞추기"
+
+[node name="FooterSeparator" type="HSeparator" parent="Root/Split/Right/Inspector/Margin/Content/LayoutFooter" unique_id=1453940955]
+layout_mode = 2
+
+[node name="Summary" type="Label" parent="Root/Split/Right/Inspector/Margin/Content/LayoutFooter" unique_id=662995936]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0.65)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="StatusBar" type="PanelContainer" parent="Root" unique_id=1194101486]
+layout_mode = 2
+
+[node name="Box" type="HBoxContainer" parent="Root/StatusBar" unique_id=413273933]
+layout_mode = 2
+
+[node name="Status" type="Label" parent="Root/StatusBar/Box" unique_id=2072719618]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+clip_text = true
+
+[node name="Hints" type="Label" parent="Root/StatusBar/Box" unique_id=157544370]
+modulate = Color(1, 1, 1, 0.5)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "빈 곳 끌기: 여러 개 선택 · ⌘A: 모두 · 끌기: 이동 · 손잡이: 크기 · Shift: 10px 격자 · Alt: 스냅 끄기 · 방향키: 1px (Shift 10px) · ⌘Z / ⌘⇧Z · ⌘D 복제 · Delete 삭제 · ⌘+ / ⌘− 글자 크기"
+horizontal_alignment = 2
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="OpenDialog" type="FileDialog" parent="." unique_id=942749160]
+unique_name_in_owner = true
+title = "Open a File"
+size = Vector2i(800, 500)
+ok_button_text = "열기"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.json ; 레이아웃 파일")
+use_native_dialog = true
+
+[node name="SaveDialog" type="FileDialog" parent="." unique_id=1227392819]
+unique_name_in_owner = true
+title = "레이아웃 저장"
+size = Vector2i(800, 500)
+ok_button_text = "저장"
+access = 2
+filters = PackedStringArray("*.json ; 레이아웃 파일")
+use_native_dialog = true
+
+[node name="ConfirmDiscard" type="ConfirmationDialog" parent="." unique_id=1775278005]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "저장하지 않은 변경"
+ok_button_text = "저장"
+cancel_button_text = "취소"
+
+[node name="Alert" type="AcceptDialog" parent="." unique_id=1768362208]
+unique_name_in_owner = true
+oversampling_override = 1.0
+size = Vector2i(520, 100)
+dialog_autowrap = true

@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+[node name="Rect" type="GridContainer"]
+size_flags_horizontal = 3
+columns = 2
+
+[node name="X" type="SpinBox" parent="."]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100000.0
+max_value = 100000.0
+step = 0.1
+allow_greater = true
+allow_lesser = true
+prefix = "X"
+select_all_on_focus = true
+
+[node name="Y" type="SpinBox" parent="."]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100000.0
+max_value = 100000.0
+step = 0.1
+allow_greater = true
+allow_lesser = true
+prefix = "Y"
+select_all_on_focus = true
+
+[node name="W" type="SpinBox" parent="."]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100000.0
+max_value = 100000.0
+step = 0.1
+allow_greater = true
+allow_lesser = true
+prefix = "W"
+select_all_on_focus = true
+
+[node name="H" type="SpinBox" parent="."]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -100000.0
+max_value = 100000.0
+step = 0.1
+allow_greater = true
+allow_lesser = true
+prefix = "H"
+select_all_on_focus = true

@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[node name="ReadOnly" type="Label"]
+modulate = Color(1, 1, 1, 0.5)
+size_flags_horizontal = 3
+text = "(없음)"

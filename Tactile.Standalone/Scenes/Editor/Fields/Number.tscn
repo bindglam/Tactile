@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[node name="Number" type="SpinBox"]
+custom_minimum_size = Vector2(60, 0)
+size_flags_horizontal = 3
+min_value = -100000.0
+max_value = 100000.0
+step = 0.1
+allow_greater = true
+allow_lesser = true
+select_all_on_focus = true

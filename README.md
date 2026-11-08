@@ -41,7 +41,7 @@ Tactile은 리듬게임을 위한 크로스플랫폼 키뷰어 엔진입니다. 
 Tactile.Core               엔진 무관 로직 (netstandard2.0, 의존성 없음)
 Tactile.Adapters.Unity     Unity 렌더러 (UnityEngine.UI 없이 엔진 모듈만 사용)
 Tactile.Adapters.Godot     Godot 4 .NET 렌더러
-Tactile.Standalone         Godot로 만든 독립 키뷰어 앱
+Tactile.Standalone         Godot로 만든 독립 앱 (레이아웃 에디터 + 투명 표시 창)
 Tactile.ADOFAI             A Dance of Fire and Ice용 MelonLoader 모드
 ```
 
@@ -154,6 +154,8 @@ dotnet build Tactile.Adapters.Unity -p:UnityVersion=2022.3.62   # Unity 참조 �
 godot --path Tactile.Standalone
 ```
 
+앱은 레이아웃 에디터로 열립니다. 캔버스에서 요소를 끌어 옮기고 손잡이로 크기를 바꾸며, 오른쪽 속성 칸에서 글자·입력·모양을 고칩니다. 미리보기는 실제 키 입력에 그대로 반응합니다. **▶ 표시**를 누르면 에디터는 사라지고, 배경이 투명한 키뷰어 창만 남습니다. 끌어서 옮기고, 우클릭 메뉴나 더블클릭·Esc로 편집으로 돌아옵니다.
+
 배포용 zip은 `scripts/build.py`로 만듭니다. 결과는 `build/` 폴더에 생기고, 라이선스 파일이 함께 들어갑니다.
 
 ```bash
@@ -161,7 +163,7 @@ scripts/build.py adofai standalone -v 0.2.0   # 대상: core, unity, godot, adof
 ```
 
 > [!NOTE]
-> macOS에서는 처음 실행할 때 **입력 모니터링** 권한을 요청합니다. 권한이 없는 동안에는 안내 화면을 띄우고, 허용하면 키뷰어가 자동으로 시작됩니다.
+> macOS에서는 처음 실행할 때 **입력 모니터링** 권한을 요청합니다. 권한이 없는 동안에는 에디터 위쪽에 안내가 뜨고, 허용하면 키 입력이 자동으로 연결됩니다.
 
 ## 라이선스
 

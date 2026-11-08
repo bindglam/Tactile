@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[node name="ListItem" type="HBoxContainer"]
+size_flags_horizontal = 3
+
+[node name="Remove" type="Button" parent="."]
+layout_mode = 2
+tooltip_text = "지우기"
+text = "✕"
+flat = true

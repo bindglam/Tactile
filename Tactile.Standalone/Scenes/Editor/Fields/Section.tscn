@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[node name="Section" type="VBoxContainer"]
+size_flags_horizontal = 3
+
+[node name="Header" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+flat = true
+alignment = 0
+
+[node name="Indent" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+
+[node name="Body" type="VBoxContainer" parent="Indent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4

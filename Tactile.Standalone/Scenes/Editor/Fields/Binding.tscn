@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[node name="Binding" type="HBoxContainer"]
+size_flags_horizontal = 3
+
+[node name="Edit" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "키 이름. 예: A, Space, D1, Numpad9, LeftShift"
+select_all_on_focus = true
+
+[node name="Capture" type="Button" parent="."]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+tooltip_text = "누른 뒤 지정할 키를 누르세요"
+text = "⌨"

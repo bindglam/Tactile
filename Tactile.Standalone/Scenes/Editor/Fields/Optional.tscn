@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[node name="Optional" type="VBoxContainer"]
+size_flags_horizontal = 3
+
+[node name="Use" type="CheckBox" parent="."]
+layout_mode = 2
+text = "사용"
