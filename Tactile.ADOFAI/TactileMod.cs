@@ -17,7 +17,7 @@ namespace Tactile.ADOFAI;
 
 /// <summary>
 /// 얼불춤 화면 위에 Tactile 키뷰어를 띄우는 모드.
-/// 설정 창(기본 F5)에서 <c>UserData/Tactile/layouts/</c>의 레이아웃을 고르고, 키뷰어는 마우스로 끌어서 옮깁니다.
+/// 설정 창(기본 F5)에서 <c>UserData/Tactile/layouts/</c>의 레이아웃을 고르고, 창이 열려 있는 동안 키뷰어를 마우스로 끌어서 옮깁니다.
 /// 설정은 <c>UserData/MelonPreferences.cfg</c>의 [Tactile] 항목에 저장됩니다.
 /// </summary>
 public sealed class TactileMod : MelonMod
@@ -241,13 +241,13 @@ public sealed class TactileMod : MelonMod
         ApplyPlacement();
     }
 
-    /// <summary>키뷰어 위에서 왼쪽 버튼을 누른 채 끌면 옮기고, 놓으면 가장 가까운 화면 구석 기준으로 위치를 저장합니다.</summary>
+    /// <summary>설정 창이 열려 있을 때 키뷰어 위에서 왼쪽 버튼을 누른 채 끌면 옮기고, 놓으면 가장 가까운 화면 구석 기준으로 위치를 저장합니다.</summary>
     private void UpdateDrag()
     {
         Vector2 mouse = UnityEngine.Input.mousePosition;
         if (!_dragging)
         {
-            if (_settings.DragToMove.Value && _viewer!.Visible && UnityEngine.Input.GetMouseButtonDown(0)
+            if (_window.IsOpen && _viewer!.Visible && UnityEngine.Input.GetMouseButtonDown(0)
                 && !_window.Contains(mouse) && ScreenRect().Contains(mouse))
             {
                 _dragging = true;

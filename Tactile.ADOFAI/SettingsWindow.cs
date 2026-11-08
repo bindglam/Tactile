@@ -4,7 +4,8 @@ namespace Tactile.ADOFAI;
 
 /// <summary>
 /// 설정 창 (IMGUI). <see cref="TactileSettings.SettingsKey"/>(기본 F5)로 열고 닫습니다.
-/// 레이아웃 폴더의 파일 목록에서 레이아웃을 고르고, 보이기·크기·손 표시·드래그를 바꿀 수 있습니다.
+/// 레이아웃 폴더의 파일 목록에서 레이아웃을 고르고, 보이기·크기·손 표시를 바꿀 수 있습니다.
+/// 창이 열려 있는 동안에만 키뷰어를 마우스로 끌어서 옮길 수 있습니다.
 /// </summary>
 internal sealed class SettingsWindow
 {
@@ -106,8 +107,6 @@ internal sealed class SettingsWindow
             _mod.ReloadLayout();
         }
 
-        _settings.DragToMove.Value = GUILayout.Toggle(_settings.DragToMove.Value, " 마우스로 끌어서 옮기기");
-
         GUILayout.Label($"크기: {_settings.Scale.Value:0.00}");
         float scale = GUILayout.HorizontalSlider(_settings.Scale.Value, 0.1f, 2f);
         if (!Mathf.Approximately(scale, _settings.Scale.Value))
@@ -116,6 +115,7 @@ internal sealed class SettingsWindow
             _mod.ApplyPlacement();
         }
 
+        GUILayout.Label("키뷰어를 마우스로 끌어서 옮길 수 있습니다.");
         GUILayout.Space(6f);
         if (GUILayout.Button("위치 초기화"))
             _mod.ResetPlacement();
