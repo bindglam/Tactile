@@ -140,6 +140,13 @@ public sealed class KeyVisual
             Rect box = Bounds;
             double pixelsPerTick = rain.Speed / Stopwatch.Frequency;
 
+            // 너비는 키 박스 중앙 기준. 오프셋은 막대 전체(시작 자리 포함)를 옮김
+            Vector2 offset = rain.Offset;
+            float verticalWidth = rain.Width > 0f ? rain.Width : box.Width;
+            float horizontalWidth = rain.Width > 0f ? rain.Width : box.Height;
+            float acrossX = box.X + (box.Width - verticalWidth) / 2f + offset.X;
+            float acrossY = box.Y + (box.Height - horizontalWidth) / 2f + offset.Y;
+
             for (int order = 0; order < state.Rain.Count && count < _rain.Length; order++)
             {
                 RainSegment segment = state.Rain.Get(order, out int slot);
@@ -158,10 +165,10 @@ public sealed class KeyVisual
                 float length = head - tail;
                 Rect bounds = rain.Direction switch
                 {
-                    RainDirection.Up => new Rect(box.X, box.Y - head, box.Width, length),
-                    RainDirection.Down => new Rect(box.X, box.Bottom + tail, box.Width, length),
-                    RainDirection.Left => new Rect(box.X - head, box.Y, length, box.Height),
-                    _ => new Rect(box.Right + tail, box.Y, length, box.Height),
+                    RainDirection.Up => new Rect(acrossX, box.Y - head + offset.Y, verticalWidth, length),
+                    RainDirection.Down => new Rect(acrossX, box.Bottom + tail + offset.Y, verticalWidth, length),
+                    RainDirection.Left => new Rect(box.X - head + offset.X, acrossY, length, horizontalWidth),
+                    _ => new Rect(box.Right + tail + offset.X, acrossY, length, horizontalWidth),
                 };
 
                 _rain[count++] = new RainBar(bounds, slot);

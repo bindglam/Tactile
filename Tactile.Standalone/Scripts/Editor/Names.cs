@@ -25,6 +25,8 @@ public static class Names
         ["Speed"] = "속도 (px/s)",
         ["MaxLength"] = "최대 길이",
         ["Color"] = "색",
+        ["Width"] = "너비 (0: 키에 맞춤)",
+        ["Offset"] = "오프셋",
         ["ShowCount"] = "누른 횟수 표시",
         ["Kind"] = "종류",
         ["Look"] = "모양",

@@ -98,4 +98,12 @@ public struct RainSettings
     public float MaxLength { get; set; }
 
     public Color Color { get; set; }
+
+    /// <summary>
+    /// 막대 너비(px, 흐르는 방향과 수직인 쪽 길이). 키 박스 중앙에 맞춰 그립니다. 0 이하면 키 박스 너비(좌우로 흐르면 높이)와 같습니다.
+    /// </summary>
+    public float Width { get; set; }
+
+    /// <summary>레인 전체를 옮기는 거리(px). 막대가 시작하는 자리와 잘리는 자리가 함께 움직입니다.</summary>
+    public Vector2 Offset { get; set; }
 }
