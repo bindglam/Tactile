@@ -24,10 +24,10 @@ public static class DefaultLayouts
         (KeyCode.D1, Finger.LeftRing),
         (KeyCode.D2, Finger.LeftMiddle),
         (KeyCode.E, Finger.LeftIndex),
-        (KeyCode.P, Finger.RightIndex),
-        (KeyCode.Equal, Finger.RightMiddle),
-        (KeyCode.Backspace, Finger.RightRing),
-        (KeyCode.Backslash, Finger.RightPinky));
+        (KeyCode.PageDown, Finger.RightIndex),
+        (KeyCode.Backslash, Finger.RightMiddle),
+        (KeyCode.NumpadDivide, Finger.RightRing),
+        (KeyCode.Numpad9, Finger.RightPinky));
 
     /// <summary>키를 가로로 나란히 놓고, 위로 레인, 아래에 KPS와 Total을 두는 레이아웃 (손 없음).</summary>
     public static KeyViewerLayout Keys(params KeyCode[] keys) => Keys(keys.Select(k => (k, (Finger?)null)).ToArray());
