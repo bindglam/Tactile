@@ -56,6 +56,19 @@
           Mods/      ← 모드 본체 (MelonLoader가 모드로 불러옴)
           UserLibs/  ← 모드가 쓰는 라이브러리 (Tactile.Core, Tactile.Adapters.Unity)
     -->
+    <!-- MelonInfo는 상수 문자열만 받으므로, Directory.Build.props의 버전을 상수로 만들어 넣음 -->
+    <Target Name="GenerateBuildInfo" BeforeTargets="BeforeCompile;CoreCompile">
+        <PropertyGroup>
+            <BuildInfoFile>$(IntermediateOutputPath)BuildInfo.g.cs</BuildInfoFile>
+        </PropertyGroup>
+        <WriteLinesToFile File="$(BuildInfoFile)" Overwrite="true" WriteOnlyWhenDifferent="true"
+                          Lines="// 빌드할 때 자동 생성 (Directory.Build.props의 버전);namespace Tactile.ADOFAI%3B;internal static class TactileBuildInfo { public const string Version = &quot;$(Version)&quot;%3B }" />
+        <ItemGroup>
+            <Compile Include="$(BuildInfoFile)" />
+            <FileWrites Include="$(BuildInfoFile)" />
+        </ItemGroup>
+    </Target>
+
     <Target Name="DeployToGame" AfterTargets="Build" Condition="'$(Deploy)' == 'true' And Exists('$(GameDir)/MelonLoader')">
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(GameDir)/Mods" />
         <Copy SourceFiles="$(OutDir)Tactile.Core.dll;$(OutDir)Tactile.Adapters.Unity.dll" DestinationFolder="$(GameDir)/UserLibs" />

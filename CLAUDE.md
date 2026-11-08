@@ -15,6 +15,9 @@ dotnet build Tactile.Adapters.Unity -p:UnityVersion=2022.3.62 # Unity 참조 버
 dotnet build Tactile.ADOFAI                       # 게임 경로가 다르면 -p:GameDir="...", 복사 안 하려면 -p:Deploy=false
 # 게임 로그: <게임 폴더>/MelonLoader/Latest.log, 설정: <게임 폴더>/UserData/MelonPreferences.cfg [Tactile]
 
+# 배포용 zip (build/ 폴더): core, unity, godot, adofai, standalone[-macos|-windows], all
+scripts/build.py adofai standalone -v 0.2.0   # 독립 앱은 Tactile.Standalone/export_presets.cfg의 프리셋과 내보내기 템플릿 필요
+
 # Standalone (Godot 4.7.2 .NET 앱) 실행 / 헤드리스 확인
 /Applications/Godot.app/Contents/MacOS/Godot --path Tactile.Standalone
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path Tactile.Standalone --quit-after 60
@@ -23,6 +26,10 @@ dotnet build Tactile.ADOFAI                       # 게임 경로가 다르면 -
 - Unity 참조 어셈블리는 `NuGet.config`의 BepInEx 피드(`UnityEngine.Modules`)에서 받습니다.
 - 테스트 프로젝트는 아직 없습니다. 지금까지는 `Tactile.Core`를 참조하는 임시 콘솔 프로젝트(net10.0)를 만들고, 가짜 `IInputDevice<KeyboardEvent>`로 이벤트를 넣고 `KeyViewer.Update(long timestamp)`에 시각을 직접 주어 검증했습니다. `GC.GetAllocatedBytesForCurrentThread()`로 프레임 루프 할당 0도 확인합니다. 임시 프로젝트(`.tmp-*`)는 끝나면 지웁니다.
 - 렌더링 확인은 임시 Godot 프로젝트를 창 모드로 띄워 `GetViewport().GetTexture().GetImage().SavePng(...)`로 캡처합니다 (헤드리스는 렌더링이 안 됨).
+
+## 버전
+
+솔루션 버전은 `Directory.Build.props`의 `TactileVersion` 한 곳에서만 바꿉니다 (모든 프로젝트의 `Version`, 모드의 `MelonInfo` — 빌드 때 `TactileBuildInfo.Version` 상수로 생성 —, `scripts/build.py`의 zip 이름과 앱 버전). 한 번만 다르게 하려면 `-p:TactileVersion=...` 또는 `scripts/build.py -v ...`. 독립 앱의 Info.plist/파일 버전은 `build.py`가 내보내는 동안만 `export_presets.cfg`에 숫자 버전을 넣었다가 되돌립니다.
 
 ## 프로젝트 구성
 

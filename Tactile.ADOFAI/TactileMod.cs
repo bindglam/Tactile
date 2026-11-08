@@ -8,7 +8,7 @@ using Tactile.Core.Layout.Serialization;
 using Tactile.Standalone.Layouts;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(TactileMod), "Tactile", "0.1.0", "bindglam")]
+[assembly: MelonInfo(typeof(TactileMod), "Tactile", TactileBuildInfo.Version, "bindglam")]
 [assembly: MelonGame("7th Beat Games", "A Dance of Fire and Ice")]
 
 namespace Tactile.ADOFAI;

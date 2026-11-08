@@ -1,0 +1,23 @@
+<Project>
+
+    <!--
+        솔루션 전체 공통 설정. 모든 프로젝트(Godot 프로젝트 포함)에 자동으로 적용됩니다.
+
+        버전은 여기 한 곳에서만 바꿉니다. DLL 버전, 얼불춤 모드 버전(MelonInfo), 배포 zip 이름(scripts/build.py),
+        독립 앱 버전(내보낼 때 project.godot의 config/version에 넣음)이 모두 이 값을 씁니다.
+        한 번만 다른 버전으로 빌드하려면: dotnet build -p:TactileVersion=0.2.0-beta (또는 scripts/build.py -v 0.2.0-beta)
+    -->
+    <PropertyGroup>
+        <TactileVersion Condition="'$(TactileVersion)' == ''">0.1.0</TactileVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Version>$(TactileVersion)</Version>
+        <Authors>bindglam</Authors>
+        <Product>Tactile</Product>
+        <Copyright>© 2026 Woobeen Jeon</Copyright>
+        <!-- 정보 버전에 git 커밋 해시를 붙이지 않음 (모드 로더 화면 등에 그대로 보이므로) -->
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    </PropertyGroup>
+
+</Project>

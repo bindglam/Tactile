@@ -31,7 +31,7 @@ Tactile은 리듬게임을 위한 크로스플랫폼 키뷰어 엔진입니다. 
 | `StatElement` | `tactile:stat` | 통계 표시: `Kps`, `MaxKps`, `Total` |
 | `HandsElement` | `tactile:hands` | 키보드 위 두 손. 누른 손가락과 손 전체가 함께 움직임 |
 
-손 요소는 [ADOFAI Macro 3](https://github.com/CLiF-1593/ADOFAI_Macro_for_Publish)(CLiF-1593, MIT)의 손 캠을 옮긴 것입니다. 원작의 뼈대 치수, 쉬는 자세, 애니메이션을 그대로 따르되, 원작은 미래 입력을 아는 매크로라서 하던 "준비 동작"만 실시간 입력에 맞게 빠져 있습니다.
+손 요소는 [ADOFAI Macro 3](https://github.com/CLiF-1593/ADOFAI_Macro_for_Publish)(FFLiK, MIT)의 손 캠을 옮긴 것입니다. 원작의 뼈대 치수, 쉬는 자세, 애니메이션을 그대로 따르되, 원작은 미래 입력을 아는 매크로라서 하던 "준비 동작"만 실시간 입력에 맞게 빠져 있습니다.
 
 <p align="center"><img src="docs/hands.png" alt="손 요소 미리보기" width="420"></p>
 
@@ -154,6 +154,12 @@ dotnet build Tactile.Adapters.Unity -p:UnityVersion=2022.3.62   # Unity 참조 �
 godot --path Tactile.Standalone
 ```
 
+배포용 zip은 `scripts/build.py`로 만듭니다. 결과는 `build/` 폴더에 생기고, 라이선스 파일이 함께 들어갑니다.
+
+```bash
+scripts/build.py adofai standalone -v 0.2.0   # 대상: core, unity, godot, adofai, standalone, all
+```
+
 > [!NOTE]
 > macOS에서는 처음 실행할 때 **입력 모니터링** 권한을 요청합니다. 권한이 없는 동안에는 안내 화면을 띄우고, 허용하면 키뷰어가 자동으로 시작됩니다.
 
@@ -161,4 +167,4 @@ godot --path Tactile.Standalone
 
 [MIT](LICENSE) © 2026 Woobeen Jeon
 
-손 요소는 [ADOFAI_Macro_for_Publish](https://github.com/CLiF-1593/ADOFAI_Macro_for_Publish)(MIT, CLiF-1593)의 손 캠 코드를 바탕으로 합니다.
+손 요소는 FFLiK의 [ADOFAI Macro 3](https://github.com/CLiF-1593/ADOFAI_Macro_for_Publish)(MIT) 손 캠 코드를 바탕으로 합니다. 저작권 고지와 라이선스 전문은 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)에 있습니다.
