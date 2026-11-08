@@ -24,7 +24,7 @@ public readonly record struct HandStroke(Vector2 From, Vector2 To, float Width, 
 internal readonly record struct HandPose(float Zoom, float UpDown, float LeftRight, float XOffset);
 
 /// <summary>
-/// 두 손을 3D로 그리는 데 필요한 값. 손 뼈대 계산은 ADOFAI Macro 3(CLiF-1593, MIT)의 <c>Hand::Simulate</c>를 옮긴 것입니다.
+/// 두 손을 3D로 그리는 데 필요한 값. 손 뼈대 계산은 ADOFAI Macro 3(FFLiK, MIT — THIRD_PARTY_NOTICES.md 참고)의 <c>Hand::Simulate</c>를 옮긴 것입니다.
 /// <see cref="Revision"/>이 바뀌었을 때만 다시 그리면 됩니다.
 /// </summary>
 public sealed class HandsVisual

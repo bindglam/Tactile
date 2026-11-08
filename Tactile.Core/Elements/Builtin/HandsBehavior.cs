@@ -6,7 +6,7 @@ using Tactile.Core.State;
 namespace Tactile.Core.Elements.Builtin;
 
 /// <summary>
-/// 손 요소의 로직. ADOFAI Macro 3(CLiF-1593, MIT) 손 캠의 애니메이션을 실시간 입력에 맞게 옮긴 것입니다.
+/// 손 요소의 로직. ADOFAI Macro 3(FFLiK, MIT — THIRD_PARTY_NOTICES.md 참고) 손 캠의 애니메이션을 실시간 입력에 맞게 옮긴 것입니다.
 /// <list type="bullet">
 /// <item>손가락: 누르면 뿌리 마디가 <see cref="HandsElement.PressAngle"/>만큼 내려가고(Ease Out), 떼면 돌아옴.
 /// 누르는 동작이 끝나기 전에 떼도 끝까지 누른 뒤 돌아오므로, 아주 짧은 입력도 보입니다.</item>

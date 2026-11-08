@@ -4,7 +4,7 @@ using Tactile.Core.Primitives;
 namespace Tactile.Core.Layout.Elements;
 
 /// <summary>
-/// 키보드 위에 올린 두 손. 움직임과 손 모양은 ADOFAI Macro 3(CLiF-1593, MIT)의 손 캠을 바탕으로 합니다:
+/// 키보드 위에 올린 두 손. 움직임과 손 모양은 ADOFAI Macro 3(FFLiK, MIT — THIRD_PARTY_NOTICES.md 참고)의 손 캠을 바탕으로 합니다:
 /// <list type="bullet">
 /// <item>손가락: 누르면 뿌리 마디가 <see cref="PressAngle"/>만큼 내려감</item>
 /// <item>손 (주된 움직임): 한 손의 연타(겹쳐 누르기 포함)가 시작되면 손이 내려가며(작아지고 앞으로 숙임),
