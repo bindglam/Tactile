@@ -107,6 +107,13 @@ public sealed class TactileMod : MelonMod
                 InputPermissions.OpenKeyboardSettings();
             _viewer = new TactileUnityViewer(_layout, new UnityLegacyKeyboard(), ownsKeyboard: true);
         }
+        catch (InvalidOperationException e)
+        {
+            // Windows 키보드 훅 설치 실패 등: 게임 창 입력으로 대신 표시
+            LoggerInstance.Warning($"전역 키보드 입력을 시작하지 못했습니다: {e.Message}");
+            LoggerInstance.Warning("게임 창에 포커스가 있을 때의 입력만 표시합니다 (프레임 단위).");
+            _viewer = new TactileUnityViewer(_layout, new UnityLegacyKeyboard(), ownsKeyboard: true);
+        }
         catch (Exception e)
         {
             LoggerInstance.Error($"키뷰어를 만들지 못했습니다: {e}");

@@ -61,7 +61,13 @@ scripts/build.py adofai standalone -v 0.2.0   # 독립 앱은 Tactile.Standalone
 
 `LayoutSerializer`가 `KeyViewerLayout`을 JSON으로 저장·불러옵니다. netstandard2.0에 `System.Text.Json`이 없어 `Json.cs`에 최소 JSON 리더(주석·끝 쉼표 허용, 줄 번호 오류)/라이터를 직접 두었습니다. 요소는 `"type"`에 `ElementRegistry` 종류 ID를 쓰고, 나머지는 리플렉션으로 공개 get/public set 속성을 camelCase로 저장합니다 (애드온 요소도 등록만으로 저장됨, 제외는 `[LayoutIgnore]`, 매개변수 없는 생성자 필요). 기본 지원 값이 아닌 읽기 전용 형식(`Color`, `Rect`, `Vector2/3`, `InputBinding`)은 직렬화기에 직접 변환 코드가 있습니다. 불러올 때 파일에 없는 속성은 기본값 유지(스타일 객체·구조체는 기본값 위에 덮어씀), 등록되지 않은 종류는 `UnknownElement`로 원본을 보존해 다시 저장합니다. Standalone은 `user://layout.json`, 모드는 `UserData/Tactile/layout.json`을 읽고, 없으면 기본 레이아웃을 저장합니다.
 
-### 입력 (macOS)
+### 입력
+
+플랫폼별 장치는 `KeyboardDevice`(수집 스레드 + 큐)를 상속하고, `PlatformKeyboard.Create()`가 현재 OS의 장치를 고릅니다. 공용 `KeyCode`는 USB HID 위치 기준입니다.
+
+**Windows** (`Input/Keyboard/Windows`): 저수준 키보드 훅(`WH_KEYBOARD_LL`)을 수집 스레드에 걸고 그 스레드의 메시지 루프에서 받습니다. Raw Input은 프로세스마다 키보드 수신 창이 하나뿐이라 게임 안(모드)에서 게임 입력과 서로 빼앗으므로 쓰지 않습니다. 콜백은 static + `[ThreadStatic]` 현재 장치(IL2CPP). `RawCode`는 스캔 코드(확장 키 0xE0xx, Pause 0xE11D), `KeyCode`는 위치 기준이되 글자 키만 앞 창의 키보드 배열(`MapVirtualKeyEx`)을 따르고, 자동 반복 Down은 버립니다. 테스트는 Wine(`wine`, win-x64 self-contained로 publish)에서 보이는 창에 포커스를 준 뒤 `SendInput`으로 합니다 — 포커스 창이 없으면 Wine이 입력을 전달하지 않고, 잠금 키는 Wine의 `MapVirtualKeyEx`가 0을 돌려줍니다.
+
+**macOS**:
 
 - `KeyboardDevice`는 별도 스레드에서 이벤트를 수집해 큐에 넣고, 이벤트 시각은 `Stopwatch` 타임스탬프입니다. `Start()`는 호출한 스레드에서 `PrepareStart()`를 먼저 실행합니다.
 - **TIS/UCKeyTranslate(키 배열 조회)는 반드시 메인 스레드에서만** 호출해야 합니다. 다른 스레드에서 부르면 GUI 앱이 멈춥니다 (`MacOSNative.IsMainThread`로 확인, 아니면 위치 기반 표로 대체).

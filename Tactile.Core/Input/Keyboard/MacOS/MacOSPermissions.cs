@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace Tactile.Core.Input.Keyboard.MacOS;
 
@@ -10,6 +11,7 @@ namespace Tactile.Core.Input.Keyboard.MacOS;
 /// "아직 묻지 않음"과 "거부됨"을 구분해 주므로 이쪽을 사용합니다. (macOS 10.15+)
 /// </para>
 /// </summary>
+[SupportedOSPlatform("macos")]
 internal static class MacOSPermissions
 {
     private const string IOKit = "/System/Library/Frameworks/IOKit.framework/IOKit";

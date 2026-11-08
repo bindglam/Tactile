@@ -2,7 +2,6 @@ using System;
 using Godot;
 using Tactile.Core.Input;
 using Tactile.Core.Input.Keyboard;
-using Tactile.Core.Input.Keyboard.MacOS;
 
 namespace Tactile.Standalone.App;
 
@@ -45,13 +44,13 @@ public sealed class SharedKeyboard : IInputDevice<KeyboardEvent>
         if (_device is not null)
             return;
 
-        if (!OperatingSystem.IsMacOS())
+        if (!PlatformKeyboard.IsSupported)
         {
             SetStatus(KeyboardStatus.NotSupported);
             return;
         }
 
-        var device = new MacOSKeyboardDevice();
+        KeyboardDevice device = PlatformKeyboard.Create();
         try
         {
             device.Start();
@@ -62,6 +61,13 @@ public sealed class SharedKeyboard : IInputDevice<KeyboardEvent>
         {
             device.Dispose();
             SetStatus(KeyboardStatus.WaitingForPermission);
+        }
+        catch (InvalidOperationException e)
+        {
+            // 훅 설치 실패 등 (권한 문제가 아니므로 다시 시도하지 않음)
+            device.Dispose();
+            GD.PushError($"[Tactile] 키보드 입력을 시작하지 못했습니다: {e.Message}");
+            SetStatus(KeyboardStatus.NotSupported);
         }
     }
 

@@ -1,8 +1,10 @@
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace Tactile.Core.Input.Keyboard.MacOS;
 
 /// <summary>macOS 네이티브 공용 도우미. (netstandard2.0에는 NativeLibrary가 없어 dlopen/dlsym을 직접 사용)</summary>
+[SupportedOSPlatform("macos")]
 internal static class MacOSNative
 {
     private const string LibSystem = "/usr/lib/libSystem.dylib";

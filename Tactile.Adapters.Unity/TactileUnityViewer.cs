@@ -4,6 +4,7 @@ using Tactile.Core;
 using Tactile.Core.Input;
 using Tactile.Core.Input.Keyboard;
 using Tactile.Core.Input.Keyboard.MacOS;
+using Tactile.Core.Input.Keyboard.Windows;
 using Tactile.Core.Layout;
 using Tactile.Core.Rendering;
 using UnityEngine;
@@ -127,12 +128,13 @@ public sealed class TactileUnityViewer : IDisposable
     }
 
     /// <summary>
-    /// 현재 플랫폼의 키보드 장치를 만듭니다. macOS는 OS 전역 입력(정확한 입력 시각),
+    /// 현재 플랫폼의 키보드 장치를 만듭니다. macOS·Windows는 OS 전역 입력(정확한 입력 시각),
     /// 그 밖의 플랫폼은 아직 전용 장치가 없어 Unity 입력을 프레임마다 확인하는 <see cref="UnityLegacyKeyboard"/>를 사용합니다.
     /// </summary>
     public static IInputDevice<KeyboardEvent> CreatePlatformKeyboard() => Application.platform switch
     {
         RuntimePlatform.OSXPlayer or RuntimePlatform.OSXEditor => new MacOSKeyboardDevice(),
+        RuntimePlatform.WindowsPlayer or RuntimePlatform.WindowsEditor => new WindowsKeyboardDevice(),
         _ => new UnityLegacyKeyboard(),
     };
 }

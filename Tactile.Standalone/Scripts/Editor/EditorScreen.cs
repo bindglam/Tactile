@@ -9,6 +9,7 @@ using Tactile.Core.Layout;
 using Tactile.Core.Layout.Elements;
 using Tactile.Core.Layout.Serialization;
 using Tactile.Core.Input;
+using Tactile.Core.Input.Keyboard;
 using Tactile.Standalone.App;
 using Tactile.Standalone.Layouts;
 using CoreRect = Tactile.Core.Primitives.Rect;
@@ -257,6 +258,7 @@ public sealed partial class EditorScreen : Control
         _permission.Text = _keyboard.Status switch
         {
             KeyboardStatus.WaitingForPermission => "입력 모니터링 권한이 없어 미리보기가 키 입력에 반응하지 않습니다",
+            KeyboardStatus.NotSupported when PlatformKeyboard.IsSupported => "키 입력을 시작하지 못했습니다 (로그를 확인하세요)",
             KeyboardStatus.NotSupported => $"이 운영체제({OS.GetName()})는 키 입력을 아직 지원하지 않습니다",
             _ => "",
         };

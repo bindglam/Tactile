@@ -4,7 +4,6 @@ using Tactile.Core;
 using Tactile.Core.Elements;
 using Tactile.Core.Input;
 using Tactile.Core.Input.Keyboard;
-using Tactile.Core.Input.Keyboard.MacOS;
 using Tactile.Core.Layout;
 using Tactile.Core.Rendering;
 
@@ -128,11 +127,6 @@ public sealed class TactileGodotViewer : IDisposable
             _root.QueueFree();
     }
 
-    private static IInputDevice<KeyboardEvent> CreatePlatformKeyboard()
-    {
-        if (OperatingSystem.IsMacOS())
-            return new MacOSKeyboardDevice();
-
-        throw new PlatformNotSupportedException($"{OS.GetName()}은 아직 지원하지 않습니다.");
-    }
+    /// <summary>현재 운영체제의 전역 키보드 장치 (macOS, Windows). 그 밖의 운영체제는 <see cref="PlatformNotSupportedException"/>.</summary>
+    private static IInputDevice<KeyboardEvent> CreatePlatformKeyboard() => PlatformKeyboard.Create();
 }

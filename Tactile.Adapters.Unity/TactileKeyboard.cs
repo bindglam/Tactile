@@ -1,5 +1,6 @@
 using Tactile.Core.Input.Keyboard;
 using Tactile.Core.Input.Keyboard.MacOS;
+using Tactile.Core.Input.Keyboard.Windows;
 using UnityEngine;
 
 namespace Tactile.Adapters.Unity;
@@ -61,6 +62,7 @@ public sealed class TactileKeyboard : MonoBehaviour
     private static KeyboardDevice CreateDevice() => Application.platform switch
     {
         RuntimePlatform.OSXPlayer or RuntimePlatform.OSXEditor => new MacOSKeyboardDevice(),
+        RuntimePlatform.WindowsPlayer or RuntimePlatform.WindowsEditor => new WindowsKeyboardDevice(),
         _ => throw new PlatformNotSupportedException($"{Application.platform}은 아직 지원하지 않습니다."),
     };
 }
